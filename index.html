@@ -88,16 +88,21 @@ nav{background:#0a0a0a;border-bottom:1px solid var(--border);padding:11px 16px;p
 .mode-banner-btn{padding:10px 22px;border-radius:9px;border:none;cursor:pointer;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;transition:.15s}
 .view-mode .mode-banner-btn{background:var(--acc);color:#000}
 .edit-mode .mode-banner-btn{background:#000;color:#fff}
-/* STAGE VIEW - 超大きい文字 */
-.sl-list{padding:4px 6px}
-.sl-item{padding:14px 10px!important;margin-bottom:6px!important}
-.item-name{font-size:28px!important;font-weight:700!important;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mc-item .item-name{font-size:22px!important}
-.item-num{width:40px!important;height:40px!important;font-size:16px!important;flex-shrink:0}
-.item-dur{font-size:18px!important;font-weight:500!important}
-.tag{font-size:13px!important;padding:4px 12px!important}
-.item-meta{gap:8px!important;margin-top:6px!important}
-.item-actions .act-btn{font-size:13px!important;padding:7px 12px!important}
+/* STAGE VIEW - 1画面8曲に収まるサイズ */
+.sl-list{padding:3px 5px}
+.sl-item{padding:8px 10px!important;margin-bottom:3px!important;transition:transform .2s ease,opacity .2s ease,margin .2s ease,max-height .25s ease;}
+.item-name{font-size:20px!important;font-weight:700!important;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2}
+.mc-item .item-name{font-size:16px!important}
+.item-num{width:30px!important;height:30px!important;font-size:12px!important;flex-shrink:0}
+.item-dur{font-size:14px!important;font-weight:500!important}
+.tag{font-size:11px!important;padding:2px 8px!important}
+.item-meta{gap:6px!important;margin-top:4px!important}
+.item-actions .act-btn{font-size:12px!important;padding:5px 10px!important}
+/* 挿入アニメーション：スライド */
+.sl-item.slide-down{animation:slideDown .22s ease-out}
+.sl-item.slide-up{animation:slideUp .22s ease-out}
+@keyframes slideDown{0%{transform:translateY(-100%);opacity:0}100%{transform:translateY(0);opacity:1}}
+@keyframes slideUp{0%{transform:translateY(100%);opacity:0}100%{transform:translateY(0);opacity:1}}
 /* 挿入インジケーター */
 .insert-above{border-top:3px solid var(--acc)!important;margin-top:-3px}
 .insert-below{border-bottom:3px solid var(--acc)!important}
@@ -937,7 +942,7 @@ function dp(e,i){
     const moved=items.splice(dragSrc,1)[0];
     const ri=insertIdx>dragSrc?insertIdx-1:insertIdx;
     items.splice(ri,0,moved); render(); autoSave();
-    setTimeout(()=>{const el=document.getElementById('si-'+moved.id);if(el)el.classList.add('just-inserted');},10);
+    animateInsert(moved.id, ri, items.length);
     showToast('✓ 順番を変更しました');
   }
   dragSrc=null;dragOver=null;insertIdx=null;
@@ -1004,13 +1009,30 @@ function te(e,i){
     const moved=items.splice(touchSrc,1)[0];
     const ri=insertIdx>touchSrc?insertIdx-1:insertIdx;
     items.splice(ri,0,moved); render(); autoSave();
-    setTimeout(()=>{const el=document.getElementById('si-'+moved.id);if(el)el.classList.add('just-inserted');},10);
+    animateInsert(moved.id, ri, items.length);
     showToast('✓ 順番を変更しました');
   }
   touchSrc=null;dragOver=null;insertIdx=null;longPressActive=false;touchMoved=false;
 }
 
 // ===== TOAST =====
+function animateInsert(movedId, insertedAt, total){
+  // 再描画後、移動した曲と周囲にスライドアニメ
+  render();
+  setTimeout(()=>{
+    items.forEach((it, idx)=>{
+      const el=document.getElementById('si-'+it.id);
+      if(!el)return;
+      if(it.id===movedId){
+        // 移動した曲は上からor下からスライドイン
+        el.classList.remove('slide-up','slide-down','just-inserted');
+        void el.offsetWidth;
+        el.classList.add('just-inserted');
+      }
+    });
+  },10);
+}
+
 function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&formMode&&document.activeElement.closest('.add-form'))doAdd();});
 
