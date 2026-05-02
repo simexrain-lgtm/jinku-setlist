@@ -881,9 +881,13 @@ function de(){
 
 // タッチ用（スマホ）
 function ts(e,i){
+  // 閲覧モードは何もしない（スクロール通す）
   if(!editMode||e.target.classList.contains('act-btn'))return;
   longPressActive=false;touchSrc=null;dragOver=null;insertIdx=null;
+  const startY=e.touches[0].clientY;
   const el=e.currentTarget;
+  // タッチ開始座標を記録（指が動いたらキャンセル）
+  el._touchStartY=startY;
   longPressTimer=setTimeout(()=>{
     longPressActive=true;
     touchSrc=i;
@@ -893,7 +897,17 @@ function ts(e,i){
   },1000);
 }
 function tm(e){
-  if(!longPressActive||touchSrc===null){clearTimeout(longPressTimer);return;}
+  // 長押し前 → 指が少し動いたらタイマーキャンセル（スクロールを妨げない）
+  if(!longPressActive){
+    const el=e.currentTarget||e.target.closest('.sl-item');
+    if(el&&el._touchStartY!==undefined){
+      const dy=Math.abs(e.touches[0].clientY - el._touchStartY);
+      if(dy>8) clearTimeout(longPressTimer);
+    }
+    return; // preventDefault しない → スクロール有効
+  }
+  // 長押し確定後だけスクロールを止めてドラッグ
+  if(touchSrc===null)return;
   e.preventDefault();
   const cy=e.touches[0].clientY;
   document.querySelectorAll('.sl-item').forEach((el,i)=>{
