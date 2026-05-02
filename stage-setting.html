@@ -54,10 +54,37 @@ input::placeholder{color:var(--muted2)}
 .bdel{padding:10px;border-radius:9px;border:1px solid #5a1a1a;cursor:pointer;font-size:13px;font-weight:700;flex:1;background:#2b0d0d;color:var(--danger);font-family:'Noto Sans JP',sans-serif}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(50px);background:var(--surface2);border:1px solid var(--acc);color:var(--text);padding:9px 16px;border-radius:10px;font-size:12px;opacity:0;transition:.3s;z-index:999;pointer-events:none;white-space:nowrap}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+/* EDIT MODE */
+body.edit-active{--bg:#1a0d00;--surface:#2a1500;--surface2:#331a00;--surface3:#3d2000;--border:#6b3a00;--border2:#8a4d00;--text:#fff5ec;--muted:#cc8844}
+body.edit-active nav{background:#ff6b1aee;border-bottom-color:#ff9d5c}
+body.edit-active .logo{color:#000}
+/* MODE BANNER */
+.mode-banner{position:fixed;bottom:0;left:0;right:0;z-index:200;padding:10px 14px;display:none;align-items:center;justify-content:space-between;gap:10px;backdrop-filter:blur(12px);transition:all .4s cubic-bezier(.4,0,.2,1)}
+.mode-banner.show{display:flex}
+.mode-banner.view-mode{background:rgba(10,10,10,.95);border-top:1px solid var(--border2)}
+.mode-banner.edit-mode{background:#ff6b1a;border-top:2px solid #ff9d5c}
+.mode-banner.mini{padding:6px 12px;border-radius:20px 20px 0 0;left:auto;right:16px;width:auto}
+.mode-banner.mini .mb-label{font-size:0;width:0;overflow:hidden}
+.mode-banner.mini .mb-btn{font-size:0;padding:0;width:0;overflow:hidden}
+.mb-icon{font-size:18px;flex-shrink:0}
+.mb-label{font-size:14px;font-weight:700;transition:all .3s;white-space:nowrap}
+.view-mode .mb-label{color:var(--muted)}
+.edit-mode .mb-label{color:#000}
+.mb-btn{padding:8px 18px;border-radius:9px;border:none;cursor:pointer;font-size:13px;font-weight:700;font-family:'Noto Sans JP',sans-serif;transition:all .3s;white-space:nowrap}
+.view-mode .mb-btn{background:#ff6b1a;color:#000}
+.edit-mode .mb-btn{background:#000;color:#fff}
+/* 閲覧モード時は機材タップ無効をビジュアルで示す */
+body:not(.edit-active) #cv{cursor:default}
+body.edit-active #cv{cursor:grab}
 </style>
 </head>
 <body>
 <nav><div class="nav-inner"><span class="logo">🎸 ステージセッティング</span><a href="index.html" style="font-size:12px;color:var(--muted);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:7px;transition:.15s" onmouseover="this.style.borderColor='#ff6b1a';this.style.color='#ff6b1a'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">← セトリに戻る</a></div></nav>
+<div class="mode-banner" id="mode-banner" onclick="expandBanner()">
+  <span class="mb-icon" id="mb-icon">🔒</span>
+  <span class="mb-label" id="mb-label">閲覧モード — タップで誤操作防止</span>
+  <button class="mb-btn" id="mb-btn" onclick="event.stopPropagation();toggleEdit()">✏️ 編集する</button>
+</div>
 <div class="wrap">
   <div class="band-tabs">
     <button class="btab on" onclick="sw('gg')">グッバイ<br>グッピー</button>
@@ -177,7 +204,7 @@ const BANDS={
     ]}
 };
 
-let cBid='gg',allItems={gg:[],bpc:[],shika:[]},seq=1,editId=null;
+let cBid='gg',allItems={gg:[],bpc:[],shika:[]},seq=1,editId=null,editMode=false,bannerTimer=null;
 let drag=null,doff={x:0,y:0},moved=false;
 let W=0,H=0,sY=0,sH=0;
 const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
@@ -220,9 +247,20 @@ function renderMembers(){
 
 function resize(){
   const r=cv.parentElement.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
-  W=Math.floor(r.width)||340;H=Math.round(W*.68);
+  W=Math.floor(r.width)||340;
+  // 横画面でも縦が短くなりすぎないようにする
+  const maxH=Math.round(window.innerHeight*0.65);
+  H=Math.min(Math.round(W*.68), maxH);
   cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';
-  ctx.scale(dpr,dpr);sY=H*.06;sH=H*.78;draw();
+  ctx.scale(dpr,dpr);sY=H*.06;sH=H*.78;
+  // 配置済みアイテムのxp/ypを再計算してx/yを更新
+  ['gg','bpc','shika'].forEach(bid=>{
+    allItems[bid].forEach(it=>{
+      if(it.xp!==undefined) it.x=it.xp*W;
+      if(it.yp!==undefined) it.y=it.yp*W;
+    });
+  });
+  draw();
 }
 
 function draw(){
@@ -341,8 +379,21 @@ function hit(x,y){
 }
 
 function gxy(e){const r=cv.getBoundingClientRect(),s=e.touches?e.touches[0]:e;return{x:s.clientX-r.left,y:s.clientY-r.top};}
-function onD(e){e.preventDefault();const p=gxy(e);const h=hit(p.x,p.y);moved=false;drag=null;if(h){drag=h;doff.x=p.x-h.x;doff.y=p.y-h.y;h.x=h.x??h.xp*W;h.y=h.y??h.yp*W;}}
-function onM(e){e.preventDefault();if(!drag)return;const p=gxy(e);drag.x=p.x-doff.x;drag.y=p.y-doff.y;moved=true;draw();}
+function onD(e){
+  e.preventDefault();
+  if(!editMode)return; // 閲覧モードは操作不可
+  const p=gxy(e);const h=hit(p.x,p.y);moved=false;drag=null;
+  if(h){drag=h;doff.x=p.x-h.x;doff.y=p.y-h.y;h.x=h.x??h.xp*W;h.y=h.y??h.yp*W;}
+}
+function onM(e){
+  e.preventDefault();
+  if(!drag||!editMode)return;
+  const p=gxy(e);
+  drag.x=p.x-doff.x;drag.y=p.y-doff.y;
+  // xp/ypも更新（リサイズ時に位置が保持される）
+  drag.xp=drag.x/W; drag.yp=drag.y/W;
+  moved=true;draw();
+}
 function onU(e){e.preventDefault();if(drag){if(isOut(drag))allItems[cBid]=allItems[cBid].filter(i=>i.id!==drag.id);const was=drag;drag=null;draw();if(!moved)openP(was);}moved=false;}
 cv.addEventListener('touchstart',onD,{passive:false});
 cv.addEventListener('touchmove',onM,{passive:false});
@@ -386,6 +437,39 @@ function saveItem(){
 function delItem(){allItems[cBid]=allItems[cBid].filter(i=>i.id!==editId);closeP();}
 document.getElementById('pov').addEventListener('click',e=>{if(e.target.id==='pov')closeP();});
 
+function toggleEdit(){
+  editMode=!editMode;
+  applyEditMode();
+}
+
+function expandBanner(){
+  const mb=document.getElementById('mode-banner');
+  mb.classList.remove('mini');
+  clearTimeout(bannerTimer);
+  bannerTimer=setTimeout(()=>mb.classList.add('mini'),3000);
+}
+
+function applyEditMode(){
+  document.body.classList.toggle('edit-active',editMode);
+  const mb=document.getElementById('mode-banner');
+  const icon=document.getElementById('mb-icon');
+  const label=document.getElementById('mb-label');
+  const btn=document.getElementById('mb-btn');
+  // ツールバー・パレット表示切り替え
+  document.getElementById('pal').style.opacity=editMode?'1':'0.4';
+  document.getElementById('pal').style.pointerEvents=editMode?'':'none';
+  document.querySelectorAll('.tb').forEach(b=>{b.style.opacity=editMode?'1':'0.4';b.style.pointerEvents=editMode?'':'none';});
+  document.getElementById('trash').style.display=editMode?'':'none';
+  if(mb){mb.classList.toggle('show',true);mb.classList.toggle('edit-mode',editMode);mb.classList.toggle('view-mode',!editMode);}
+  if(icon) icon.textContent=editMode?'✏️':'🔒';
+  if(label) label.textContent=editMode?'編集モード中 — ドラッグで移動':'閲覧モード — 誤操作防止中';
+  if(btn)   btn.textContent=editMode?'✅ 完了':'✏️ 編集する';
+  mb.classList.remove('mini');
+  clearTimeout(bannerTimer);
+  bannerTimer=setTimeout(()=>mb.classList.add('mini'),3000);
+  draw();
+}
+
 function expTxt(){
   const items=allItems[cBid];if(!items.length){showToast('機材が配置されていません');return;}
   const b=BANDS[cBid];let t='【ステージセッティング】'+b.name+'\n江刺甚句まつり 2026年5月3日\n'+'─'.repeat(28)+'\n';
@@ -404,7 +488,10 @@ function expTxt(){
 function showToast(msg){const e=document.getElementById('toast');e.textContent=msg;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2200);}
 
 window.addEventListener('resize',resize);
+// orientationchange対応
+window.addEventListener('orientationchange',()=>setTimeout(resize,100));
 resize();renderMembers();
+setTimeout(applyEditMode,100);
 </script>
 </body>
 </html>
