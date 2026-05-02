@@ -54,6 +54,37 @@ nav{background:#0a0a0a;border-bottom:1px solid var(--border);padding:11px 16px;p
 .now-badge{display:inline-block;font-size:9px;padding:1px 7px;border-radius:10px;background:var(--acc);color:#000;font-weight:700;margin-left:6px;vertical-align:middle}
 .tl-bar-wrap{height:3px;background:var(--border2);border-radius:2px;margin-top:6px;overflow:hidden;width:100%}
 .tl-bar-fill{height:100%;background:var(--acc);border-radius:2px;transition:width 5s linear}
+/* PA/照明用セトリ */
+.pa-sheet{padding:0}
+.pa-sheet-hd{padding:11px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
+.pa-sheet-hd:hover{background:var(--surface2)}
+.pa-sheet-body{display:none;border-top:1px solid var(--border)}
+.pa-sheet-body.open{display:block}
+.pa-song-row{display:grid;grid-template-columns:28px 1fr;gap:0;border-bottom:1px solid var(--border)}
+.pa-song-row:last-child{border-bottom:none}
+.pa-song-row.mc-row{background:var(--surface3)}
+.pa-num{padding:10px 0 10px 14px;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--acc);line-height:1.2}
+.pa-num.mc-num{color:var(--info);font-size:13px;padding-top:13px}
+.pa-content{padding:10px 14px 10px 8px}
+.pa-song-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
+.pa-mc-name{font-size:13px;color:var(--muted);font-style:italic}
+.pa-tags{display:flex;flex-wrap:wrap;gap:5px}
+.pa-tag{font-size:11px;padding:2px 9px;border-radius:10px;font-weight:500}
+.pa-dur{background:var(--surface3);color:var(--muted);border:1px solid var(--border)}
+.pa-tempo-slow{background:#1a2e3a;color:#7fc8f8;border:1px solid #2a4a5a}
+.pa-tempo-fast{background:#3a2800;color:#f9ca4a;border:1px solid #5a3f00}
+.pa-light{background:#3a2000;color:#ff9d5c;border:1px solid #5a3500}
+.pa-pa{background:#1a2a3a;color:#74b9ff;border:1px solid #2a4060}
+.pa-note{background:var(--surface3);color:var(--muted);border:1px solid var(--border)}
+.pa-sheet-summary{padding:10px 14px;background:var(--surface3);border-top:1px solid var(--border);font-size:12px;color:var(--muted);display:flex;gap:16px}
+/* EDIT MODE */
+.edit-mode-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);cursor:pointer;font-size:12px;font-weight:500;font-family:'Noto Sans JP',sans-serif;transition:.2s;display:flex;align-items:center;gap:5px}
+.edit-mode-btn.on{background:var(--acc);color:#000;border-color:var(--acc)}
+.edit-mode-btn.on:hover{background:var(--acc2)}
+.edit-lock-banner{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px 13px;margin-bottom:8px;font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sl-item.locked{cursor:default}
+.sl-item.locked .drag-handle{opacity:.2;pointer-events:none}
+.sl-item.locked .act-btn{opacity:.3;pointer-events:none}
 .band-select-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
 .band-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:space-between}
 .band-card:hover{border-color:var(--acc);transform:translateX(4px)}
@@ -172,12 +203,19 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5)}
 
 <nav>
   <div class="nav-inner">
-    <span class="nav-logo">江刺甚句まつり</span>
+    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+      <span class="nav-logo">桜牙伝</span>
+      <button class="nav-back" id="nav-back" onclick="goTop()">← 戻る</button>
+      <button class="edit-mode-btn" id="edit-mode-btn" onclick="toggleEditMode()" style="display:none">✏️ 編集</button>
+    </div>
     <div style="display:flex;align-items:center;gap:10px">
-      <button class="nav-back" id="nav-back" onclick="goTop()">← バンド選択に戻る</button>
+      <div style="text-align:right">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--text);letter-spacing:.05em;line-height:1" id="nav-clock">--:--</div>
+        <div style="font-size:9px;color:var(--muted);margin-top:1px" id="nav-next"></div>
+      </div>
       <span class="save-indicator">
         <span class="save-dot" id="save-dot"></span>
-        <span id="save-label">　</span>
+        <span id="save-label" style="display:none"></span>
       </span>
     </div>
   </div>
@@ -237,8 +275,12 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5)}
       <div class="panel-title">🎵 セットリスト</div>
       <div class="limit-row">持ち時間 <input type="number" id="limit" value="30" min="5" max="90" oninput="render()"> 分</div>
     </div>
+    <div id="edit-lock-banner" class="edit-lock-banner" style="margin:6px 8px 0;display:none">
+      <span>🔒 閲覧モード — 誤操作防止中</span>
+      <button class="edit-mode-btn on" onclick="toggleEditMode()" style="padding:4px 10px;font-size:11px">✏️ 編集する</button>
+    </div>
     <div id="sl-list" class="sl-list"><div class="sl-empty">まだ曲がありません<br>下の「曲を追加」から追加してください</div></div>
-    <div class="add-triggers">
+    <div class="add-triggers" id="add-triggers">
       <button class="trig-btn" id="trig-song" onclick="openForm('song')">🎵 曲を追加</button>
       <button class="trig-btn" id="trig-mc" onclick="openForm('mc')">🎤 MC</button>
       <button class="trig-btn" id="trig-se" onclick="openForm('se')">🔄 SE/転換</button>
@@ -290,12 +332,18 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5)}
     <span>📊</span><span id="send-lbl">スプレッドシートに送信</span>
   </button>
 
-  <div class="panel">
-    <div class="panel-hd" onclick="toggleOutput()" style="cursor:pointer">
-      <div class="panel-title">🖨 PA・照明用セトリ（タップで展開）</div>
-      <button class="btn-sm" onclick="event.stopPropagation();copyOut()">📋 コピー</button>
+  <div class="panel pa-sheet">
+    <div class="pa-sheet-hd" onclick="togglePaSheet()">
+      <div class="panel-title">🎚 PA・照明用セトリ</div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="btn-sm" onclick="event.stopPropagation();copyOut()">📋 コピー</button>
+        <span id="pa-chevron" style="font-size:18px;color:var(--acc);transition:.25s;line-height:1">›</span>
+      </div>
     </div>
-    <pre id="out-txt" class="output-pre"></pre>
+    <div class="pa-sheet-body" id="pa-sheet-body">
+      <div id="pa-sheet-rows"></div>
+      <div class="pa-sheet-summary" id="pa-sheet-summary"></div>
+    </div>
   </div>
 
 </div>
@@ -382,7 +430,7 @@ const DEFAULT_BANDS = [
   {id:'shika', name:'鹿ROCK',            limit:30, sentAt:null, updatedAt:new Date().toISOString(), items:[]},
 ];
 
-let bands=[], curId=null, items=[], seq=1, editId=null, formMode=null;
+let bands=[], curId=null, items=[], seq=1, editId=null, formMode=null, editMode=false;
 let dragSrc=null, dragOver=null, touchSrc=null, actx=null, saveTimer=null;
 
 // ===== STORAGE =====
@@ -424,10 +472,41 @@ function s2t(s){s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+(s%60<10
 function total(){return items.reduce((a,it)=>a+d2s(it.dur),0);}
 
 // ===== PAGE NAVIGATION =====
+function toggleEditMode(){
+  editMode=!editMode;
+  applyEditMode();
+}
+
+function applyEditMode(){
+  const btn=document.getElementById('edit-mode-btn');
+  const banner=document.getElementById('edit-lock-banner');
+  const triggers=document.getElementById('add-triggers');
+  const addForm=document.getElementById('add-form');
+  if(btn){
+    btn.textContent=editMode?'🔒 閲覧に戻る':'✏️ 編集';
+    btn.className='edit-mode-btn'+(editMode?' on':'');
+  }
+  if(banner) banner.style.display=editMode?'none':'flex';
+  if(triggers) triggers.style.display=editMode?'flex':'none';
+  if(addForm&&!editMode) closeForm();
+  // sl-itemにlocked付与
+  document.querySelectorAll('.sl-item').forEach(el=>{
+    el.classList.toggle('locked',!editMode);
+    el.setAttribute('draggable', editMode?'true':'false');
+  });
+  // act-btnの有効/無効
+  document.querySelectorAll('.act-btn').forEach(el=>{
+    el.style.pointerEvents=editMode?'':'none';
+    el.style.opacity=editMode?'':'0.25';
+  });
+}
+
 function goTop(){
   document.getElementById('page-top').classList.add('active');
   document.getElementById('page-setlist').classList.remove('active');
   document.getElementById('nav-back').style.display='none';
+  document.getElementById('edit-mode-btn').style.display='none';
+  editMode=false;
   document.getElementById('save-label').textContent='';
   renderTop();
   window.scrollTo(0,0);
@@ -445,6 +524,8 @@ function goSetlist(id){
   document.getElementById('page-top').classList.remove('active');
   document.getElementById('page-setlist').classList.add('active');
   document.getElementById('nav-back').style.display='block';
+  document.getElementById('edit-mode-btn').style.display='flex';
+  editMode=false;
   document.getElementById('save-dot').classList.add('saved');
   document.getElementById('save-label').textContent='保存済み ✓';
   document.getElementById('send-result').style.display='none';
@@ -571,6 +652,8 @@ function render(){
   }
   document.getElementById('send-btn').disabled=items.length===0;
   renderOut();
+  // ロック状態を再適用
+  setTimeout(applyEditMode, 0);
 }
 
 // ===== SEND =====
@@ -596,8 +679,67 @@ async function sendToSheets(){
 }
 
 // ===== OUTPUT =====
-function toggleOutput(){document.getElementById('out-txt').classList.toggle('open');}
+function togglePaSheet(){
+  const body=document.getElementById('pa-sheet-body');
+  const chev=document.getElementById('pa-chevron');
+  const open=!body.classList.contains('open');
+  body.classList.toggle('open',open);
+  chev.style.transform=open?'rotate(90deg)':'';
+  if(open)renderOut();
+}
+
 function renderOut(){
+  const band=bands.find(b=>b.id===curId);
+  const lim=parseInt(document.getElementById('limit').value)||30;
+  const tot=total();
+  const rowsEl=document.getElementById('pa-sheet-rows');
+  const sumEl=document.getElementById('pa-sheet-summary');
+  if(!rowsEl)return;
+
+  let sn=0, html='';
+  items.forEach(it=>{
+    const dur=d2s(it.dur);
+    const durStr=it.dur?s2t(dur):'';
+    if(it.type==='song'){
+      sn++;
+      const tags=[];
+      if(durStr) tags.push(`<span class="pa-tag pa-dur">⏱ ${durStr}</span>`);
+      if(it.tempo==='遅い') tags.push(`<span class="pa-tag pa-tempo-slow">🐢 遅い</span>`);
+      if(it.tempo==='速い') tags.push(`<span class="pa-tag pa-tempo-fast">🔥 速い</span>`);
+      if(it.light&&it.light!=='おまかせ') tags.push(`<span class="pa-tag pa-light">💡 ${it.light}</span>`);
+      if(it.pa&&it.pa!=='おまかせ') tags.push(`<span class="pa-tag pa-pa">🎚 ${it.pa}</span>`);
+      if(it.note) tags.push(`<span class="pa-tag pa-note">📝 ${it.note}</span>`);
+      html+=`<div class="pa-song-row">
+        <div class="pa-num">${sn}</div>
+        <div class="pa-content">
+          <div class="pa-song-name">${it.name}</div>
+          ${tags.length?`<div class="pa-tags">${tags.join('')}</div>`:''}
+        </div>
+      </div>`;
+    } else if(it.type==='mc'){
+      html+=`<div class="pa-song-row mc-row">
+        <div class="pa-num mc-num">MC</div>
+        <div class="pa-content">
+          <div class="pa-mc-name">🎤 ${it.name!=='MC'?it.name:'MC'}${durStr?' ('+durStr+')':''}</div>
+        </div>
+      </div>`;
+    } else {
+      html+=`<div class="pa-song-row mc-row">
+        <div class="pa-num mc-num">SE</div>
+        <div class="pa-content">
+          <div class="pa-mc-name">🔄 ${it.name!=='転換'?it.name:'転換'}${durStr?' ('+durStr+')':''}</div>
+        </div>
+      </div>`;
+    }
+  });
+  rowsEl.innerHTML=html||'<div style="padding:16px;text-align:center;font-size:12px;color:var(--muted)">曲がありません</div>';
+  if(sumEl){
+    const songs=items.filter(i=>i.type==='song').length;
+    sumEl.innerHTML=`<span>🎵 ${songs}曲</span><span>⏱ 総時間 ${s2t(tot)}</span><span>📋 持ち時間 ${lim}分</span><span>${band?.name||''}</span>`;
+  }
+}
+
+function copyOut(){
   const band=bands.find(b=>b.id===curId);
   const lim=parseInt(document.getElementById('limit').value)||30;
   const lines=['【江刺甚句まつり】2026年5月3日　江刺大通公園',`【セットリスト】${band?.name||''}`,`持ち時間：${lim}分　総時間：${s2t(total())}`,'─'.repeat(30)];
@@ -609,9 +751,9 @@ function renderOut(){
     else lines.push(`  ── 転換 ${it.dur?s2t(dur):''}　${it.name!=='転換'?it.name:''}`);
   });
   lines.push('─'.repeat(30));lines.push(`合計 ${s2t(total())} / ${lim}:00`);
-  document.getElementById('out-txt').textContent=lines.join('\n');
+  const t=lines.join('\n');
+  navigator.clipboard?.writeText(t).then(()=>showToast('コピーしました！')).catch(()=>alert(t));
 }
-function copyOut(){const t=document.getElementById('out-txt').textContent;navigator.clipboard?.writeText(t).then(()=>showToast('コピーしました！')).catch(()=>alert(t));}
 
 // ===== POPUP =====
 function openP(id){
@@ -629,11 +771,11 @@ function delById(id){items=items.filter(i=>i.id!==id);render();autoSave();}
 document.getElementById('pov').addEventListener('click',e=>{if(e.target.id==='pov')closeP();});
 
 // ===== DRAG =====
-function ds(e,i){dragSrc=i;}
+function ds(e,i){if(!editMode)return;dragSrc=i;}
 function dov(e,i){e.preventDefault();document.querySelectorAll('.sl-item').forEach(el=>el.classList.remove('over'));const el=document.getElementById('si-'+items[i]?.id);if(el)el.classList.add('over');dragOver=i;}
 function dp(e,i){e.preventDefault();if(dragSrc!==null&&dragSrc!==i){const t=items.splice(dragSrc,1)[0];items.splice(i,0,t);}document.querySelectorAll('.sl-item').forEach(el=>el.classList.remove('over'));dragSrc=null;dragOver=null;render();autoSave();}
 function de(){document.querySelectorAll('.sl-item').forEach(el=>el.classList.remove('over'));dragSrc=null;}
-function ts(e,i){if(e.target.classList.contains('act-btn'))return;touchSrc=i;dragOver=null;}
+function ts(e,i){if(!editMode||e.target.classList.contains('act-btn'))return;touchSrc=i;dragOver=null;}
 function tm(e){if(touchSrc===null)return;e.preventDefault();const cy=e.touches[0].clientY;document.querySelectorAll('.sl-item').forEach((el,i)=>{el.classList.remove('over');const r=el.getBoundingClientRect();if(cy>=r.top&&cy<=r.bottom){el.classList.add('over');dragOver=i;}});}
 function te(e,i){document.querySelectorAll('.sl-item').forEach(el=>el.classList.remove('over'));if(touchSrc!==null&&dragOver!==null&&touchSrc!==dragOver){const t=items.splice(touchSrc,1)[0];items.splice(dragOver,0,t);render();autoSave();}touchSrc=null;dragOver=null;}
 
@@ -753,13 +895,38 @@ function startClock(){
     const h=String(now.getHours()).padStart(2,'0');
     const m=String(now.getMinutes()).padStart(2,'0');
     const s=String(now.getSeconds()).padStart(2,'0');
+    // メイン時計（トップページ）
     const el=document.getElementById('clock-time');
     if(el)el.textContent=h+':'+m+':'+s;
     const days=['日','月','火','水','木','金','土'];
     const de=document.getElementById('clock-date');
     if(de)de.textContent=(now.getMonth()+1)+'月'+now.getDate()+'日（'+days[now.getDay()]+'）';
+    // ナビバー時計（常時表示）
+    const nc=document.getElementById('nav-clock');
+    if(nc)nc.textContent=h+':'+m+':'+s;
+    // ナビバー次の出番
+    const nowMin=getNowMin();
+    const current=SCHEDULE.find((s2,i)=>{
+      const sMin=timeToMin(s2.time);
+      const nextMin=i+1<SCHEDULE.length?timeToMin(SCHEDULE[i+1].time):sMin+60;
+      return s2.type==='live'&&nowMin>=sMin&&nowMin<nextMin;
+    });
+    const next=SCHEDULE.find(s2=>s2.type==='live'&&timeToMin(s2.time)>nowMin);
+    const nn=document.getElementById('nav-next');
+    if(nn){
+      if(current){
+        const rem=Math.max(0,Math.round(timeToMin(current.time)+50-nowMin));
+        nn.textContent='🎵 '+current.label.slice(0,6)+'… 残'+rem+'分';
+        nn.style.color='var(--acc)';
+      } else if(next){
+        const diff=Math.round(timeToMin(next.time)-nowMin);
+        nn.textContent='次:'+next.time+' '+next.label.slice(0,5)+'…';
+        nn.style.color='var(--muted)';
+      } else {
+        nn.textContent=''; 
+      }
+    }
     updateNextBand();
-    // 10秒ごとにタイムライン再描画
     if(now.getSeconds()%10===0)renderTimeline();
   }
   tick();
