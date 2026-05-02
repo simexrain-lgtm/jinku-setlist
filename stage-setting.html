@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ステージセッティング — 江刺甚句まつり</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none}
+:root{--bg:#0f0f0f;--surface:#1a1a1a;--surface2:#222;--surface3:#2a2a2a;--border:#333;--border2:#444;--acc:#ff6b1a;--acc2:#ff9d5c;--text:#f0ede8;--muted:#888;--muted2:#555;--success:#2ecc71;--danger:#e74c3c;--info:#3498db;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;padding-bottom:40px}
+nav{background:#0a0a0a;border-bottom:1px solid var(--border);padding:10px 14px;position:sticky;top:0;z-index:100}
+.nav-inner{max-width:700px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--acc);letter-spacing:.1em}
+.wrap{max-width:700px;margin:0 auto;padding:12px 12px 0}
+.band-tabs{display:flex;gap:6px;margin-bottom:12px}
+.btab{flex:1;padding:10px 6px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;font-size:12px;font-weight:500;text-align:center;transition:.15s;font-family:'Noto Sans JP',sans-serif;line-height:1.4}
+.btab.on{background:var(--acc);color:#000;border-color:var(--acc);font-weight:700}
+.btab:hover:not(.on){border-color:var(--acc);color:var(--acc)}
+.hint{font-size:11px;color:var(--muted);margin-bottom:8px;padding:7px 10px;background:var(--surface);border-radius:8px;line-height:1.6;border:1px solid var(--border)}
+.palette{display:flex;flex-wrap:wrap;gap:5px;padding:9px;background:var(--surface);border-radius:10px;margin-bottom:8px;border:1px solid var(--border)}
+.pi{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 8px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;transition:.15s;min-width:44px}
+.pi:hover{border-color:var(--acc)}.pi:active{transform:scale(.95)}
+.pi-icon{font-size:16px;line-height:1}.pi-lbl{font-size:9px;color:var(--muted);text-align:center;line-height:1.2}
+.toolbar{display:flex;gap:6px;margin-bottom:7px;flex-wrap:wrap;align-items:center}
+.tb{padding:5px 11px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;font-size:11px;transition:.15s;font-family:'Noto Sans JP',sans-serif}
+.tb:hover{border-color:var(--acc);color:var(--acc)}
+.trash{text-align:center;padding:6px;font-size:11px;color:var(--muted);border:1px dashed var(--border);border-radius:8px;margin-bottom:7px;transition:.2s}
+.trash.hot{border-color:var(--danger);color:var(--danger);background:rgba(231,76,60,.08)}
+.sw{border-radius:10px;overflow:visible;border:1px solid var(--border)}
+#cv{display:block;width:100%;touch-action:none;border-radius:10px}
+.slbl{display:flex;justify-content:space-between;padding:5px 4px 0;font-size:10px;color:var(--muted)}
+.members{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:10px}
+.members-title{font-size:10px;color:var(--acc);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.mrow{display:grid;grid-template-columns:110px 1fr;gap:6px;margin-bottom:5px;font-size:12px}
+.mpart{color:var(--muted)}.mname{color:var(--text);font-weight:500}
+.pov{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:.2s}
+.pov.open{opacity:1;pointer-events:all}
+.pop{background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-width:500px;padding:18px 14px 32px;transform:translateY(40px);transition:.25s;border-top:1px solid var(--border);max-height:85vh;overflow-y:auto}
+.pov.open .pop{transform:translateY(0)}
+.ph{font-size:15px;font-weight:700;margin-bottom:13px;display:flex;justify-content:space-between;align-items:center;color:var(--text)}
+.pc{background:var(--surface2);border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:13px;color:var(--muted);display:flex;align-items:center;justify-content:center;font-family:'Noto Sans JP',sans-serif}
+.fg{margin-bottom:11px}
+.fl{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.05em;display:block;margin-bottom:5px;text-transform:uppercase}
+input{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 12px;font-size:14px;font-family:'Noto Sans JP',sans-serif;outline:none;transition:.2s;width:100%}
+input:focus{border-color:var(--acc)}
+input::placeholder{color:var(--muted2)}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;font-size:12px;transition:.15s;font-family:'Noto Sans JP',sans-serif}
+.chip.on{background:var(--acc);color:#000;border-color:var(--acc);font-weight:700}
+.chip:hover:not(.on){color:var(--text);border-color:var(--border2)}
+.brow{display:flex;gap:8px;margin-top:14px}
+.bacc{padding:10px;border-radius:9px;border:none;cursor:pointer;font-size:13px;font-weight:700;flex:1;background:var(--acc);color:#000;font-family:'Noto Sans JP',sans-serif}
+.bdel{padding:10px;border-radius:9px;border:1px solid #5a1a1a;cursor:pointer;font-size:13px;font-weight:700;flex:1;background:#2b0d0d;color:var(--danger);font-family:'Noto Sans JP',sans-serif}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(50px);background:var(--surface2);border:1px solid var(--acc);color:var(--text);padding:9px 16px;border-radius:10px;font-size:12px;opacity:0;transition:.3s;z-index:999;pointer-events:none;white-space:nowrap}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1}
+</style>
+</head>
+<body>
+<nav><div class="nav-inner"><span class="logo">🎸 ステージセッティング</span><a href="index.html" style="font-size:12px;color:var(--muted);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:7px;transition:.15s" onmouseover="this.style.borderColor='#ff6b1a';this.style.color='#ff6b1a'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">← セトリに戻る</a></div></nav>
+<div class="wrap">
+  <div class="band-tabs">
+    <button class="btab on" onclick="sw('gg')">グッバイ<br>グッピー</button>
+    <button class="btab" onclick="sw('bpc')">Bull pain<br>catcher</button>
+    <button class="btab" onclick="sw('shika')">鹿ROCK</button>
+  </div>
+  <div class="hint">👆 パレットから追加 ／ ドラッグで移動 ／ <b>ステージ外へドロップで削除</b> ／ タップで詳細編集</div>
+  <div class="palette" id="pal"></div>
+  <div class="trash" id="trash">🗑 ステージ外へドロップで削除</div>
+  <div class="toolbar">
+    <button class="tb" onclick="resetBand()">↩ 初期配置</button>
+    <button class="tb" onclick="clearAll()">全クリア</button>
+    <button class="tb" onclick="expTxt()">📋 テキスト出力</button>
+    <span style="font-size:11px;color:var(--muted);margin-left:auto" id="cnt"></span>
+  </div>
+  <div class="sw"><canvas id="cv"></canvas></div>
+  <div class="slbl"><span>← 下手（お客から見て左）</span><span>上手（お客から見て右）→</span></div>
+  <div class="members" id="members"></div>
+</div>
+
+<div class="pov" id="pov">
+<div class="pop">
+  <div class="ph"><span id="pttl">機材を編集</span><button class="pc" onclick="closeP()">✕</button></div>
+  <div class="fg"><label class="fl">型番・機種名</label><input type="text" id="pm" placeholder="例：Koch コンボ / マークベース121"></div>
+  <div class="fg"><label class="fl">持ち込み / 会場借り</label>
+    <div class="chips" id="co"><button class="chip on" onclick="tc(this,'co')">会場借り</button><button class="chip" onclick="tc(this,'co')">持ち込み</button><button class="chip" onclick="tc(this,'co')">レンタル</button></div>
+  </div>
+  <div id="drum-s" style="display:none">
+    <div class="fg"><label class="fl">タム数</label><div class="chips" id="ctom"><button class="chip" onclick="tc(this,'ctom')">1タム</button><button class="chip on" onclick="tc(this,'ctom')">2タム</button><button class="chip" onclick="tc(this,'ctom')">3タム</button></div></div>
+    <div class="fg"><label class="fl">ペダル</label><div class="chips" id="cped"><button class="chip on" onclick="tc(this,'cped')">1バス</button><button class="chip" onclick="tc(this,'cped')">ツーバス（持込）</button><button class="chip" onclick="tc(this,'cped')">ツーバス（借り）</button></div></div>
+    <div class="fg"><label class="fl">シンバル</label><div class="chips" id="ccym"><button class="chip on" onclick="tc(this,'ccym')">会場のまま</button><button class="chip" onclick="tc(this,'ccym')">一部持込</button><button class="chip" onclick="tc(this,'ccym')">全部持込</button></div></div>
+    <div class="fg"><label class="fl">MTR同期</label><div class="chips" id="cmtr"><button class="chip on" onclick="tc(this,'cmtr')">なし</button><button class="chip" onclick="tc(this,'cmtr')">MTR同期あり</button></div></div>
+  </div>
+  <div id="gt-s" style="display:none">
+    <div class="fg"><label class="fl">使用アンプ</label><div class="chips" id="camp"><button class="chip on" onclick="tc(this,'camp')">上手 Amp</button><button class="chip" onclick="tc(this,'camp')">下手 Amp</button><button class="chip" onclick="tc(this,'camp')">DI直</button><button class="chip" onclick="tc(this,'camp')">持込アンプ</button></div></div>
+    <div class="fg"><label class="fl">立ち位置</label><div class="chips" id="cstd"><button class="chip" onclick="tc(this,'cstd')">下手</button><button class="chip on" onclick="tc(this,'cstd')">センター</button><button class="chip" onclick="tc(this,'cstd')">上手</button></div></div>
+    <div class="fg"><label class="fl">コーラス</label><div class="chips" id="ccho"><button class="chip on" onclick="tc(this,'ccho')">コーラスなし</button><button class="chip" onclick="tc(this,'ccho')">コーラスあり</button></div></div>
+  </div>
+  <div id="vo-s" style="display:none">
+    <div class="fg"><label class="fl">マイク種別</label><div class="chips" id="cmic"><button class="chip on" onclick="tc(this,'cmic')">SM58系</button><button class="chip" onclick="tc(this,'cmic')">コンデンサー</button><button class="chip" onclick="tc(this,'cmic')">ワイヤレス</button><button class="chip" onclick="tc(this,'cmic')">持込</button></div></div>
+  </div>
+  <div id="mon-s" style="display:none">
+    <div class="fg"><label class="fl">返し内容</label><div class="chips" id="cmon"><button class="chip on" onclick="tc(this,'cmon')">PAに任せる</button><button class="chip" onclick="tc(this,'cmon')">Vo大きめ</button><button class="chip" onclick="tc(this,'cmon')">Dr大きめ</button><button class="chip" onclick="tc(this,'cmon')">全体バランス</button></div></div>
+  </div>
+  <div class="fg"><label class="fl">メモ</label><input type="text" id="pn" placeholder="電源タップ必要 / 上手端に設置 など"></div>
+  <div class="brow"><button class="bdel" onclick="delItem()">削除</button><button class="bacc" onclick="saveItem()">保存</button></div>
+</div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const D={
+  drum:{lbl:'Dr',sub:'ドラム',col:'#c0392b',w:56,h:44,cat:'drum'},
+  ba:{lbl:'B.A',sub:'ベースAmp',col:'#1a5276',w:38,h:30,cat:'amp'},
+  ga_r:{lbl:'G.A',sub:'上手Amp',col:'#1e8449',w:38,h:30,cat:'amp'},
+  ga_l:{lbl:'G.A',sub:'下手Amp',col:'#1e8449',w:38,h:30,cat:'amp'},
+  vo:{lbl:'Vo',sub:'ボーカル',col:'#7d3c98',w:28,h:44,cat:'person'},
+  gt:{lbl:'Gt',sub:'ギター',col:'#1e8449',w:28,h:44,cat:'person'},
+  ba_p:{lbl:'Ba',sub:'ベース',col:'#1a5276',w:28,h:44,cat:'person'},
+  cho:{lbl:'Cho',sub:'コーラス',col:'#9b59b6',w:28,h:44,cat:'person'},
+  mon:{lbl:'M',sub:'モニター',col:'#d35400',w:36,h:20,cat:'mon'},
+  kbd:{lbl:'Kbd',sub:'キーボード',col:'#148f77',w:50,h:24,cat:'amp'},
+  di:{lbl:'DI',sub:'DI BOX',col:'#7f8c8d',w:22,h:20,cat:'amp'},
+};
+const PAL=['drum','ba','ga_r','ga_l','vo','gt','ba_p','cho','mon','kbd','di'];
+const EMJ={drum:'🥁',ba:'🔊',ga_r:'🔊',ga_l:'🔊',vo:'🎤',gt:'🎸',ba_p:'🎸',cho:'🎙',mon:'📺',kbd:'🎹',di:'🔌'};
+
+const BANDS={
+  gg:{name:'グッバイグッピー',members:[{p:'Vo & G1',n:'（〆）'},{p:'G2',n:''},{p:'Ba',n:'カンノ ジュン'},{p:'Dr',n:'ヨシダ ジュンイチ'}],
+    layout:[
+      {t:'ba',xp:.14,yp:.12,model:'マークベース121',own:'持ち込み',note:'下手'},
+      {t:'ga_l',xp:.30,yp:.12,model:'Dr.Z / Kochコンボ',own:'持ち込み',note:'G1用'},
+      {t:'drum',xp:.50,yp:.22,model:'共有',own:'会場借り',tom:'1タム',ped:'1バス',cym:'会場のまま',mtr:'なし'},
+      {t:'ga_r',xp:.78,yp:.12,model:'持込アンプ',own:'持ち込み',note:'G2用 上手'},
+      {t:'ba_p',xp:.22,yp:.58,model:'',own:'持ち込み',amp:'下手 Amp',std:'下手',cho:'コーラスあり',note:'Ba.Cho カンノジュン'},
+      {t:'gt',xp:.44,yp:.60,model:'',own:'会場借り',amp:'下手 Amp',std:'センター',cho:'コーラスなし',note:'G1.Vo'},
+      {t:'cho',xp:.60,yp:.60,model:'',own:'会場借り',mic:'SM58系',note:'Guest.Vo（括弧あり）'},
+      {t:'gt',xp:.76,yp:.55,model:'',own:'持ち込み',amp:'上手 Amp',std:'上手',cho:'コーラスなし',note:'G2'},
+      {t:'mon',xp:.28,yp:.82,model:'',own:'会場借り',mon:'全体バランス'},
+      {t:'mon',xp:.50,yp:.84,model:'',own:'会場借り',mon:'Vo大きめ'},
+      {t:'mon',xp:.72,yp:.82,model:'',own:'会場借り',mon:'全体バランス'},
+    ]},
+  bpc:{name:'Bull pain catcher',members:[{p:'Vo & G',n:'イシカワ ヒロシ'},{p:'G①&Cho',n:'キクチ マサヨシ'},{p:'G②',n:'アントウ ヨウスケ'},{p:'Ba&Cho',n:'サクヤマ トモミチ'},{p:'Dr&Cho',n:'ムラカミ シンヤ'}],
+    layout:[
+      {t:'ba',xp:.14,yp:.11,model:'マークベース121',own:'持ち込み',note:'下手 DI直 サクヤマ'},
+      {t:'ga_l',xp:.28,yp:.11,model:'Dr.Z / Kochコンボ',own:'持ち込み',note:'G① イシカワ'},
+      {t:'drum',xp:.50,yp:.21,model:'',own:'持ち込み',tom:'1タム',ped:'1バス',cym:'全部持込',mtr:'なし',note:'スネア・ペダル・シンバル持込 ムラカミ'},
+      {t:'ga_r',xp:.70,yp:.11,model:'Kochヘッド / Marshallキャビ',own:'持ち込み',note:'G① キクチ'},
+      {t:'ga_r',xp:.84,yp:.11,model:'Diezelヘッド・キャビ',own:'持ち込み',note:'G② アントウ'},
+      {t:'cho',xp:.50,yp:.15,model:'',own:'会場借り',mic:'SM58系',note:'cho センター奥'},
+      {t:'ba_p',xp:.22,yp:.58,model:'',own:'持ち込み',amp:'下手 Amp',std:'下手',cho:'コーラスあり',note:'Ba&Cho サクヤマ'},
+      {t:'gt',xp:.48,yp:.60,model:'',own:'会場借り',amp:'下手 Amp',std:'センター',cho:'コーラスなし',note:'Vo&G イシカワ'},
+      {t:'gt',xp:.72,yp:.55,model:'',own:'持ち込み',amp:'上手 Amp',std:'上手',cho:'コーラスあり',note:'G② アントウ'},
+      {t:'cho',xp:.22,yp:.74,model:'',own:'会場借り',mic:'SM58系',note:'cho 下手'},
+      {t:'vo',xp:.48,yp:.72,model:'',own:'会場借り',mic:'SM58系',note:'Vo&G センター'},
+      {t:'cho',xp:.72,yp:.74,model:'',own:'会場借り',mic:'SM58系',note:'cho 上手'},
+      {t:'mon',xp:.28,yp:.84,model:'',own:'会場借り',mon:'全体バランス'},
+      {t:'mon',xp:.50,yp:.86,model:'',own:'会場借り',mon:'Vo大きめ'},
+      {t:'mon',xp:.72,yp:.84,model:'',own:'会場借り',mon:'全体バランス'},
+    ]},
+  shika:{name:'鹿ROCK',members:[{p:'Gt.Vo',n:'及川 啓介（オイカワ ケイスケ）'},{p:'Gt.(&Ba)',n:'幸野 佑（コウノ タスク）'},{p:'Ba.Key.MC',n:'佐藤 康生（サトウ コウセイ）'},{p:'Dr.Cho',n:'横井 悠人（ヨコイ ハルト）'}],
+    layout:[
+      {t:'ba',xp:.12,yp:.11,model:'',own:'会場借り',note:'下手 BaAmp'},
+      {t:'drum',xp:.50,yp:.21,model:'',own:'持ち込み',tom:'2タム',ped:'1バス',cym:'全部持込',mtr:'MTR同期あり',note:'2タム構成 MTR同期 ヨコイ'},
+      {t:'ga_r',xp:.72,yp:.11,model:'',own:'会場借り',note:'GtAmp 上手①'},
+      {t:'ga_r',xp:.85,yp:.11,model:'',own:'会場借り',note:'GtAmp 上手②'},
+      {t:'kbd',xp:.18,yp:.50,model:'',own:'持ち込み',note:'Key 持込'},
+      {t:'ba_p',xp:.30,yp:.58,model:'',own:'会場借り',amp:'下手 Amp',std:'下手',cho:'コーラスなし',note:'Ba.Key.MC サトウ'},
+      {t:'gt',xp:.50,yp:.60,model:'',own:'会場借り',amp:'上手 Amp',std:'センター',cho:'コーラスなし',note:'Gt.Vo オイカワ'},
+      {t:'gt',xp:.70,yp:.55,model:'',own:'会場借り',amp:'上手 Amp',std:'上手',cho:'コーラスなし',note:'Gt コウノ'},
+      {t:'vo',xp:.30,yp:.72,model:'',own:'会場借り',mic:'SM58系',note:'Ba.Key.MC'},
+      {t:'vo',xp:.50,yp:.72,model:'',own:'会場借り',mic:'SM58系',note:'Gt.Vo'},
+      {t:'vo',xp:.70,yp:.72,model:'',own:'会場借り',mic:'SM58系',note:'Gt'},
+      {t:'mon',xp:.28,yp:.84,model:'',own:'会場借り',mon:'全体バランス'},
+      {t:'mon',xp:.50,yp:.86,model:'',own:'会場借り',mon:'Vo大きめ'},
+      {t:'mon',xp:.72,yp:.84,model:'',own:'会場借り',mon:'全体バランス'},
+    ]}
+};
+
+let cBid='gg',allItems={gg:[],bpc:[],shika:[]},seq=1,editId=null;
+let drag=null,doff={x:0,y:0},moved=false;
+let W=0,H=0,sY=0,sH=0;
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
+
+function mkItems(bid){
+  return BANDS[bid].layout.map(d=>({...d,id:seq++,type:d.t}));
+}
+['gg','bpc','shika'].forEach(b=>{allItems[b]=mkItems(b);});
+
+// palette
+const palEl=document.getElementById('pal');
+PAL.forEach(k=>{
+  const btn=document.createElement('button');
+  btn.className='pi';
+  btn.innerHTML='<span class="pi-icon">'+EMJ[k]+'</span><span class="pi-lbl">'+D[k].sub+'</span>';
+  btn.onclick=()=>{
+    const x=W*(.3+Math.random()*.4),y=sY+sH*.25+Math.random()*sH*.3;
+    allItems[cBid].push({id:seq++,type:k,x,y,model:'',own:'会場借り',tom:'2タム',ped:'1バス',cym:'会場のまま',mtr:'なし',amp:'上手 Amp',std:'センター',cho:'コーラスなし',mic:'SM58系',mon:'PAに任せる',note:''});
+    draw();
+  };
+  palEl.appendChild(btn);
+});
+
+function sw(id){
+  cBid=id;
+  document.querySelectorAll('.btab').forEach((t,i)=>t.classList.toggle('on',['gg','bpc','shika'][i]===id));
+  renderMembers();draw();
+}
+function resetBand(){
+  if(!confirm('初期配置に戻しますか？'))return;
+  allItems[cBid]=mkItems(cBid);draw();showToast('初期配置に戻しました');
+}
+function clearAll(){if(!confirm('全て削除しますか？'))return;allItems[cBid]=[];draw();}
+
+function renderMembers(){
+  const b=BANDS[cBid];
+  document.getElementById('members').innerHTML='<div class="members-title">👥 '+b.name+' メンバー</div>'+
+    b.members.filter(m=>m.n).map(m=>'<div class="mrow"><span class="mpart">'+m.p+'</span><span class="mname">'+m.n+'</span></div>').join('');
+}
+
+function resize(){
+  const r=cv.parentElement.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+  W=Math.floor(r.width)||340;H=Math.round(W*.68);
+  cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';
+  ctx.scale(dpr,dpr);sY=H*.06;sH=H*.78;draw();
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const dk=matchMedia('(prefers-color-scheme:dark)').matches;
+  ctx.fillStyle=dk?'#1c1c1c':'#f5f3ee';ctx.fillRect(0,sY,W,sH);
+  ctx.strokeStyle=dk?'#444':'#bbb';ctx.lineWidth=1;ctx.strokeRect(0,sY,W,sH);
+  ctx.fillStyle=dk?'#888':'#777';ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+  ctx.fillText('STAGE',W/2,sY+12);
+  ctx.fillStyle=dk?'#141414':'#ebe9e4';ctx.fillRect(0,sY+sH,W,H-(sY+sH));
+  ctx.fillStyle=dk?'#888':'#777';ctx.font='10px sans-serif';ctx.fillText('客席',W/2,sY+sH+14);
+  const pw=40,ph=24,py=sY+sH-ph-4;
+  dbox(4,py,pw,ph,'#555','#fff','PA');dbox(W-4-pw,py,pw,ph,'#555','#fff','PA');
+  const items=allItems[cBid];
+  items.forEach(it=>drawIt(it,dk));
+  document.getElementById('trash').className='trash'+(drag&&isOut(drag)?' hot':'');
+  document.getElementById('cnt').textContent=items.length+'個配置中';
+}
+
+function dbox(x,y,w,h,fill,tc,lbl){
+  ctx.fillStyle=fill;ctx.strokeStyle='#444';ctx.lineWidth=.8;
+  ctx.beginPath();ctx.roundRect(x,y,w,h,3);ctx.fill();ctx.stroke();
+  ctx.fillStyle=tc;ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+  ctx.fillText(lbl,x+w/2,y+h/2+4);
+}
+
+function micStand(cx,cy,col,sz){
+  const r=sz*.38,ls=sz*.55;
+  ctx.strokeStyle=col;ctx.lineWidth=1.4;
+  ctx.beginPath();ctx.arc(cx,cy-ls,r,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx,cy-ls-r);ctx.lineTo(cx,cy-ls+r);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx-r,cy-ls);ctx.lineTo(cx+r,cy-ls);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx,cy-ls+r);ctx.lineTo(cx,cy+ls*.3);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx-r*.9,cy+ls*.3);ctx.lineTo(cx+r*.9,cy+ls*.3);ctx.stroke();
+}
+
+function drawIt(it,dk){
+  const d=D[it.type];if(!d)return;
+  const x=it.x!==undefined?it.x:it.xp*W;
+  const y=it.y!==undefined?it.y:it.yp*W;
+  if(it.x===undefined){it.x=x;it.y=y;}
+  const sel=editId===it.id;
+  const fading=drag&&drag.id===it.id&&isOut(drag);
+  if(fading){ctx.save();ctx.globalAlpha=.3;}
+
+  if(d.cat==='person'){
+    const hr=d.h*.22,bh=d.h*.38,bw=d.w*.42;
+    if(sel){ctx.save();ctx.shadowColor='#ff6b1a';ctx.shadowBlur=8;}
+    ctx.fillStyle=d.col+'dd';ctx.strokeStyle=sel?'#ff6b1a':'rgba(255,255,255,.2)';ctx.lineWidth=sel?2:.8;
+    ctx.beginPath();ctx.ellipse(x,y+bh*.2,bw,bh,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+    ctx.beginPath();ctx.arc(x,y-hr*.6,hr,0,Math.PI*2);ctx.fill();ctx.stroke();
+    if(sel)ctx.restore();
+    ctx.fillStyle='#fff';ctx.font='bold 9px sans-serif';ctx.textAlign='center';
+    ctx.fillText(d.lbl,x,y+bh*.25);
+    if(it.cho==='コーラスあり'){
+      ctx.fillStyle='rgba(155,89,182,.85)';
+      ctx.beginPath();ctx.roundRect(x-14,y-bh*.6-12,28,12,2);ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='7px sans-serif';ctx.textAlign='center';ctx.fillText('Cho',x,y-bh*.6-3);
+    }
+    micStand(x,y+bh*.52,'rgba(255,255,255,.7)',13);
+    // amp line
+    if((it.type==='gt'||it.type==='ba_p')&&it.amp&&it.amp!=='DI直'){
+      const isR=it.amp.includes('上手');
+      const tgt=allItems[cBid].find(i=>(i.type==='ga_r'&&isR)||(i.type==='ga_l'&&!isR));
+      if(tgt){
+        const tx=tgt.x??tgt.xp*W,ty=tgt.y??tgt.yp*W;
+        ctx.save();ctx.strokeStyle='rgba(255,210,60,.4)';ctx.lineWidth=1.2;ctx.setLineDash([4,3]);
+        ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(tx,ty);ctx.stroke();ctx.restore();
+      }
+    }
+  } else if(d.cat==='drum'){
+    if(sel){ctx.save();ctx.shadowColor='#ff6b1a';ctx.shadowBlur=8;}
+    ctx.fillStyle='#c0392bcc';ctx.strokeStyle=sel?'#ff6b1a':'rgba(255,255,255,.15)';ctx.lineWidth=sel?2:.8;
+    ctx.beginPath();ctx.roundRect(x-d.w/2,y-d.h/2,d.w,d.h,4);ctx.fill();ctx.stroke();
+    if(sel)ctx.restore();
+    ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText('Dr',x,y-2);
+    const tgs=[];
+    if(it.tom)tgs.push(it.tom.replace('タム','T'));
+    if(it.ped&&it.ped.includes('ツー'))tgs.push('2BD');
+    if(it.mtr&&it.mtr.includes('MTR'))tgs.push('MTR');
+    if(it.cym&&!it.cym.includes('会場'))tgs.push('CYM↑');
+    if(tgs.length){ctx.font='8px sans-serif';ctx.fillStyle='#7fc8f8';ctx.fillText(tgs.join(' '),x,y+10);}
+  } else if(d.cat==='mon'){
+    if(sel){ctx.save();ctx.shadowColor='#ff6b1a';ctx.shadowBlur=8;}
+    ctx.fillStyle='#d35400cc';ctx.strokeStyle=sel?'#ff6b1a':'rgba(0,0,0,.2)';ctx.lineWidth=sel?2:.8;
+    ctx.beginPath();ctx.moveTo(x-d.w/2,y+d.h/2);ctx.lineTo(x+d.w/2,y+d.h/2);ctx.lineTo(x+d.w/2-4,y-d.h/2);ctx.lineTo(x-d.w/2+4,y-d.h/2);ctx.closePath();ctx.fill();ctx.stroke();
+    if(sel)ctx.restore();
+    ctx.fillStyle='#fff';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText('M',x,y+5);
+  } else {
+    if(sel){ctx.save();ctx.shadowColor='#ff6b1a';ctx.shadowBlur=8;}
+    ctx.fillStyle=d.col+'cc';ctx.strokeStyle=sel?'#ff6b1a':'rgba(255,255,255,.15)';ctx.lineWidth=sel?2:.8;
+    ctx.beginPath();ctx.roundRect(x-d.w/2,y-d.h/2,d.w,d.h,4);ctx.fill();ctx.stroke();
+    if(sel)ctx.restore();
+    ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText(d.lbl,x,y-1);
+    ctx.font='8px sans-serif';ctx.fillStyle='rgba(255,255,255,.75)';ctx.fillText(d.sub.slice(0,6),x,y+9);
+    if(it.model){
+      const mw=Math.min(ctx.measureText(it.model).width+8,78);
+      ctx.fillStyle='rgba(0,0,0,.6)';ctx.beginPath();ctx.roundRect(x-mw/2,y+d.h/2+2,mw,12,2);ctx.fill();
+      ctx.fillStyle='#ff9d5c';ctx.font='8px sans-serif';ctx.textAlign='center';
+      ctx.fillText(it.model.length>14?it.model.slice(0,13)+'…':it.model,x,y+d.h/2+11);
+    }
+  }
+  if(fading)ctx.restore();
+}
+
+function isOut(it){return it.y<sY-8||it.y>sY+sH+8||it.x<-8||it.x>W+8;}
+
+function hit(x,y){
+  const items=allItems[cBid];
+  for(let i=items.length-1;i>=0;i--){
+    const it=items[i],d=D[it.type];if(!d)continue;
+    const ix=it.x??it.xp*W,iy=it.y??it.yp*W;
+    if(Math.abs(x-ix)<=d.w/2+5&&Math.abs(y-iy)<=d.h/2+5)return it;
+  }
+  return null;
+}
+
+function gxy(e){const r=cv.getBoundingClientRect(),s=e.touches?e.touches[0]:e;return{x:s.clientX-r.left,y:s.clientY-r.top};}
+function onD(e){e.preventDefault();const p=gxy(e);const h=hit(p.x,p.y);moved=false;drag=null;if(h){drag=h;doff.x=p.x-h.x;doff.y=p.y-h.y;h.x=h.x??h.xp*W;h.y=h.y??h.yp*W;}}
+function onM(e){e.preventDefault();if(!drag)return;const p=gxy(e);drag.x=p.x-doff.x;drag.y=p.y-doff.y;moved=true;draw();}
+function onU(e){e.preventDefault();if(drag){if(isOut(drag))allItems[cBid]=allItems[cBid].filter(i=>i.id!==drag.id);const was=drag;drag=null;draw();if(!moved)openP(was);}moved=false;}
+cv.addEventListener('touchstart',onD,{passive:false});
+cv.addEventListener('touchmove',onM,{passive:false});
+cv.addEventListener('touchend',onU,{passive:false});
+cv.addEventListener('mousedown',onD);
+cv.addEventListener('mousemove',e=>{if(drag)onM(e);});
+cv.addEventListener('mouseup',onU);
+cv.addEventListener('mouseleave',e=>{if(drag){drag=null;draw();}});
+
+function tc(el,id){document.querySelectorAll('#'+id+' .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');}
+function cv2(id){const o=document.querySelector('#'+id+' .chip.on');return o?o.textContent:'';}
+function sc(id,v){document.querySelectorAll('#'+id+' .chip').forEach(c=>c.classList.toggle('on',c.textContent===v));}
+
+function openP(it){
+  editId=it.id;const d=D[it.type];
+  document.getElementById('pttl').textContent=(EMJ[it.type]||'🎵')+' '+d.sub+' を編集';
+  document.getElementById('pm').value=it.model||'';
+  document.getElementById('pn').value=it.note||'';
+  sc('co',it.own||'会場借り');
+  const isDr=it.type==='drum',isGt=it.type==='gt'||it.type==='ba_p',isVo=it.type==='vo'||it.type==='cho',isMon=it.type==='mon';
+  document.getElementById('drum-s').style.display=isDr?'':'none';
+  document.getElementById('gt-s').style.display=isGt?'':'none';
+  document.getElementById('vo-s').style.display=isVo?'':'none';
+  document.getElementById('mon-s').style.display=isMon?'':'none';
+  if(isDr){sc('ctom',it.tom||'2タム');sc('cped',it.ped||'1バス');sc('ccym',it.cym||'会場のまま');sc('cmtr',it.mtr||'なし');}
+  if(isGt){sc('camp',it.amp||'上手 Amp');sc('cstd',it.std||'センター');sc('ccho',it.cho||'コーラスなし');}
+  if(isVo)sc('cmic',it.mic||'SM58系');
+  if(isMon)sc('cmon',it.mon||'PAに任せる');
+  document.getElementById('pov').classList.add('open');draw();
+}
+function closeP(){document.getElementById('pov').classList.remove('open');editId=null;draw();}
+function saveItem(){
+  const it=allItems[cBid].find(i=>i.id===editId);if(!it)return;
+  it.model=document.getElementById('pm').value;it.note=document.getElementById('pn').value;it.own=cv2('co');
+  if(it.type==='drum'){it.tom=cv2('ctom');it.ped=cv2('cped');it.cym=cv2('ccym');it.mtr=cv2('cmtr');}
+  if(it.type==='gt'||it.type==='ba_p'){it.amp=cv2('camp');it.std=cv2('cstd');it.cho=cv2('ccho');}
+  if(it.type==='vo'||it.type==='cho')it.mic=cv2('cmic');
+  if(it.type==='mon')it.mon=cv2('cmon');
+  closeP();showToast('保存しました ✓');
+}
+function delItem(){allItems[cBid]=allItems[cBid].filter(i=>i.id!==editId);closeP();}
+document.getElementById('pov').addEventListener('click',e=>{if(e.target.id==='pov')closeP();});
+
+function expTxt(){
+  const items=allItems[cBid];if(!items.length){showToast('機材が配置されていません');return;}
+  const b=BANDS[cBid];let t='【ステージセッティング】'+b.name+'\n江刺甚句まつり 2026年5月3日\n'+'─'.repeat(28)+'\n';
+  items.forEach(it=>{
+    const d=D[it.type],x=it.x??it.xp*W;
+    const side=x<W*.38?'下手':x>W*.62?'上手':'センター';
+    t+='・'+d.sub;if(it.model)t+=' ［'+it.model+'］';t+=' → '+side;
+    if(it.own&&it.own!=='会場借り')t+=' / '+it.own;
+    if(it.type==='drum'){if(it.tom)t+=' / '+it.tom;if(it.mtr&&it.mtr!=='なし')t+=' / '+it.mtr;}
+    if(it.type==='gt'||it.type==='ba_p'){if(it.amp)t+=' / '+it.amp;if(it.cho==='コーラスあり')t+=' / Cho';}
+    if(it.note)t+=' ※'+it.note;t+='\n';
+  });
+  navigator.clipboard?.writeText(t).then(()=>showToast('コピーしました！')).catch(()=>alert(t));
+}
+
+function showToast(msg){const e=document.getElementById('toast');e.textContent=msg;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2200);}
+
+window.addEventListener('resize',resize);
+resize();renderMembers();
+</script>
+</body>
+</html>
