@@ -3,1187 +3,408 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>セットリスト入力 — 江刺甚句まつり</title>
+<title>ステージセッティング — 江刺甚句まつり</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{--bg:#0f0f0f;--surface:#1a1a1a;--surface2:#222;--surface3:#2a2a2a;--border:#333;--border2:#444;--acc:#ff6b1a;--acc2:#ff9d5c;--text:#f0ede8;--muted:#888;--muted2:#555;--success:#2ecc71;--danger:#e74c3c;--warn:#f39c12;--info:#3498db;}
-body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;padding-bottom:60px}
-
-/* NAV */
-nav{background:#0a0a0a;border-bottom:1px solid var(--border);padding:11px 16px;position:sticky;top:0;z-index:100}
-.nav-inner{max-width:600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--acc);letter-spacing:.1em;white-space:nowrap}
-.nav-back{background:transparent;border:1px solid var(--border2);border-radius:7px;padding:5px 12px;color:var(--muted);cursor:pointer;font-size:12px;font-family:'Noto Sans JP',sans-serif;display:none;transition:.15s}
-.nav-back:hover{border-color:var(--acc);color:var(--acc)}
-.save-indicator{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:5px;white-space:nowrap}
-.save-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);transition:.3s;flex-shrink:0}
-.save-dot.saved{background:var(--success)}
-
-/* PAGES */
-.page{display:none;max-width:600px;margin:0 auto;padding:16px 14px 0}
-.page.active{display:block}
-
-/* ===== TOP PAGE ===== */
-.top-hero{text-align:center;padding:20px 0 14px}
-.top-event-name{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--acc);letter-spacing:.1em;margin-bottom:3px}
-.top-event-sub{font-size:12px;color:var(--muted)}
-.top-section-label{font-size:10px;color:var(--acc);font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
-.clock-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;gap:12px}
-.clock-display{font-family:'Bebas Neue',sans-serif;font-size:48px;color:var(--text);letter-spacing:.05em;line-height:1}
-.clock-right{text-align:right}
-.next-label{font-size:10px;color:var(--muted);margin-bottom:2px}
-.next-band{font-size:14px;font-weight:700;color:var(--acc)}
-.next-time{font-size:11px;color:var(--muted);margin-top:2px}
-.timeline-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:12px}
-.timeline-title{font-size:10px;color:var(--acc);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px}
-.tl-row{display:flex;align-items:flex-start;gap:12px;position:relative;padding-bottom:4px}
-.tl-row:not(:last-child)::after{content:'';position:absolute;left:18px;top:36px;height:calc(100% - 8px);width:1px;background:var(--border)}
-.tl-dot{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;border:2px solid var(--border);background:var(--surface2);z-index:1;position:relative}
-.tl-dot.staff{background:#1a2a3a;border-color:#2a4060}
-.tl-dot.reh{background:#2a1a3a;border-color:#4a2a60}
-.tl-dot.live{background:#3a1a0a;border-color:var(--acc)}
-.tl-dot.now{background:var(--acc);border-color:var(--acc2);animation:pulse 1.5s ease-in-out infinite}
-.tl-dot.done{background:var(--surface3);border-color:var(--border2);opacity:.5}
-@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,107,26,.5)}50%{box-shadow:0 0 0 8px rgba(255,107,26,0)}}
-.tl-body{flex:1;padding:6px 0 12px}
-.tl-time-label{font-size:10px;color:var(--muted);margin-bottom:2px;font-variant-numeric:tabular-nums}
-.tl-band-name{font-size:14px;font-weight:700;color:var(--text)}
-.tl-band-name.dim{color:var(--muted);font-weight:400}
-.tl-band-sub{font-size:11px;color:var(--muted);margin-top:2px}
-.now-badge{display:inline-block;font-size:9px;padding:1px 7px;border-radius:10px;background:var(--acc);color:#000;font-weight:700;margin-left:6px;vertical-align:middle}
-.tl-bar-wrap{height:3px;background:var(--border2);border-radius:2px;margin-top:6px;overflow:hidden;width:100%}
-.tl-bar-fill{height:100%;background:var(--acc);border-radius:2px;transition:width 5s linear}
-/* PA/照明用セトリ */
-.pa-sheet{padding:0}
-.pa-sheet-hd{padding:11px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none}
-.pa-sheet-hd:hover{background:var(--surface2)}
-.pa-sheet-body{display:none;border-top:1px solid var(--border)}
-.pa-sheet-body.open{display:block}
-.pa-song-row{display:grid;grid-template-columns:28px 1fr;gap:0;border-bottom:1px solid var(--border)}
-.pa-song-row:last-child{border-bottom:none}
-.pa-song-row.mc-row{background:var(--surface3)}
-.pa-num{padding:10px 0 10px 14px;font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--acc);line-height:1.2}
-.pa-num.mc-num{color:var(--info);font-size:13px;padding-top:13px}
-.pa-content{padding:10px 14px 10px 8px}
-.pa-song-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px}
-.pa-mc-name{font-size:13px;color:var(--muted);font-style:italic}
-.pa-tags{display:flex;flex-wrap:wrap;gap:5px}
-.pa-tag{font-size:11px;padding:2px 9px;border-radius:10px;font-weight:500}
-.pa-dur{background:var(--surface3);color:var(--muted);border:1px solid var(--border)}
-.pa-tempo-slow{background:#1a2e3a;color:#7fc8f8;border:1px solid #2a4a5a}
-.pa-tempo-fast{background:#3a2800;color:#f9ca4a;border:1px solid #5a3f00}
-.pa-light{background:#3a2000;color:#ff9d5c;border:1px solid #5a3500}
-.pa-pa{background:#1a2a3a;color:#74b9ff;border:1px solid #2a4060}
-.pa-note{background:var(--surface3);color:var(--muted);border:1px solid var(--border)}
-.pa-sheet-summary{padding:10px 14px;background:var(--surface3);border-top:1px solid var(--border);font-size:12px;color:var(--muted);display:flex;gap:16px}
-/* MODE BANNER */
-.mode-banner{position:fixed;bottom:0;left:0;right:0;z-index:200;padding:10px 16px;display:none;align-items:center;justify-content:space-between;gap:10px;backdrop-filter:blur(8px)}
-.mode-banner.view-mode{background:rgba(10,10,10,.92);border-top:2px solid var(--border2)}
-.mode-banner.edit-mode{background:rgba(255,107,26,.95);border-top:2px solid var(--acc2)}
-.mode-banner.show{display:flex}
-.mode-banner-label{font-size:15px;font-weight:700;letter-spacing:.05em;display:flex;align-items:center;gap:8px}
-.view-mode .mode-banner-label{color:var(--muted)}
-.edit-mode .mode-banner-label{color:#000}
-.mode-banner-btn{padding:10px 22px;border-radius:9px;border:none;cursor:pointer;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;transition:.15s}
-.view-mode .mode-banner-btn{background:var(--acc);color:#000}
-.edit-mode .mode-banner-btn{background:#000;color:#fff}
-/* STAGE VIEW - 超大きい文字 */
-.sl-list{padding:4px 6px}
-.sl-item{padding:14px 10px!important;margin-bottom:6px!important}
-.item-name{font-size:28px!important;font-weight:700!important;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mc-item .item-name{font-size:22px!important}
-.item-num{width:40px!important;height:40px!important;font-size:16px!important;flex-shrink:0}
-.item-dur{font-size:18px!important;font-weight:500!important}
-.tag{font-size:13px!important;padding:4px 12px!important}
-.item-meta{gap:8px!important;margin-top:6px!important}
-.item-actions .act-btn{font-size:13px!important;padding:7px 12px!important}
-/* 挿入インジケーター */
-.insert-above{border-top:3px solid var(--acc)!important;margin-top:-3px}
-.insert-below{border-bottom:3px solid var(--acc)!important}
-.insert-indicator{height:0;overflow:hidden;transition:height .15s ease;background:transparent}
-.insert-indicator.show{height:40px;background:#ff6b1a18;border-radius:8px;border:2px dashed var(--acc);display:flex;align-items:center;justify-content:center;color:var(--acc);font-size:12px;font-weight:700}
-/* ドラッグ中のアイテム */
-.sl-item.dragging-src{opacity:.35;transform:scale(.97)}
-@keyframes insert-pop{0%{transform:scaleY(0);opacity:0}60%{transform:scaleY(1.08)}100%{transform:scaleY(1);opacity:1}}
-.sl-item.just-inserted{animation:insert-pop .25s ease-out}
-/* DRAG GHOST */
-#drag-ghost{
-  position:fixed;z-index:999;pointer-events:none;
-  background:var(--surface);border:2px solid var(--acc);
-  border-radius:10px;padding:10px 14px;
-  box-shadow:0 8px 32px rgba(255,107,26,.45);
-  opacity:.92;transform:scale(1.04) rotate(-1.5deg);
-  transition:opacity .1s;
-  max-width:80vw;min-width:160px;
-  display:none;
-}
-#drag-ghost .ghost-num{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--acc);margin-right:8px}
-#drag-ghost .ghost-name{font-size:18px;font-weight:700;color:var(--text)}
-/* LONG PRESS */
-@keyframes longpress-fill{from{width:0%}to{width:100%}}
-.long-press-active{border-color:var(--acc)!important;background:#ff6b1a18!important;transform:scale(1.02);transition:transform .1s;}
-.sl-item{transition:transform .1s,border-color .15s,background .15s;}
-/* EDIT MODE */
-.edit-mode-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);cursor:pointer;font-size:12px;font-weight:500;font-family:'Noto Sans JP',sans-serif;transition:.2s;display:flex;align-items:center;gap:5px}
-.edit-mode-btn.on{background:var(--acc);color:#000;border-color:var(--acc)}
-.edit-mode-btn.on:hover{background:var(--acc2)}
-.edit-lock-banner{background:var(--surface2);border:1px solid var(--border);border-radius:9px;padding:9px 13px;margin-bottom:8px;font-size:12px;color:var(--muted);display:flex;align-items:center;justify-content:space-between;gap:8px}
-.sl-item.locked{cursor:default}
-.sl-item.locked .drag-handle{opacity:.2;pointer-events:none}
-.sl-item.locked .act-btn{opacity:.3;pointer-events:none}
-.band-select-list{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
-.band-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px 18px;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:space-between}
-.band-card:hover{border-color:var(--acc);transform:translateX(4px)}
-.band-card:active{transform:translateX(2px)}
-.band-card.has-data{border-color:#2a4a2a}
-.band-card-left{}
-.band-card-name{font-size:18px;font-weight:700;color:var(--text);margin-bottom:4px}
-.band-card-meta{font-size:12px;color:var(--muted)}
-.band-card-status{display:flex;align-items:center;gap:8px}
-.status-badge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:700}
-.badge-empty{background:var(--surface3);color:var(--muted);border:1px solid var(--border2)}
-.badge-partial{background:#3a2800;color:var(--warn);border:1px solid #5a3f00}
-.badge-done{background:#0d2b1a;color:var(--success);border:1px solid #1a4a2a}
-.badge-sent{background:#0a1f2a;color:var(--info);border:1px solid #1a3a4a}
-.chevron{color:var(--acc);font-size:22px;line-height:1}
-.add-band-btn{width:100%;padding:13px;border-radius:12px;border:1px dashed var(--border2);background:transparent;color:var(--muted);cursor:pointer;font-size:13px;font-weight:500;transition:.15s;font-family:'Noto Sans JP',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px}
-.add-band-btn:hover{border-color:var(--acc);color:var(--acc)}
-.event-info-mini{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:20px;display:grid;grid-template-columns:1fr 1fr;gap:6px}
-.ei-item{font-size:12px}
-.ei-label{color:var(--muted);font-size:10px;display:block;margin-bottom:2px}
-
-/* ===== SETLIST PAGE ===== */
-.band-hero{text-align:center;padding:16px 0 12px;border-bottom:1px solid var(--border);margin-bottom:14px}
-.band-hero-name{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--acc);letter-spacing:.05em}
-.band-hero-sub{font-size:12px;color:var(--muted);margin-top:3px}
-.summary{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px}
-.sum-cell{background:var(--surface);padding:10px 8px;text-align:center}
-.sum-lbl{font-size:10px;color:var(--muted);margin-bottom:3px}
-.sum-val{font-size:20px;font-weight:700;color:var(--text)}
-.sum-val.warn{color:var(--danger)}.sum-val.ok{color:var(--success)}
-.tl-bar{height:5px;background:var(--surface2);border-radius:3px;margin-bottom:10px;overflow:hidden;display:flex;gap:1px}
-.tl-song{background:var(--acc)}.tl-mc{background:var(--info)}
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
-.panel-hd{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
-.panel-title{font-size:13px;font-weight:500;color:var(--text)}
-.limit-row{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
-.limit-row input{width:36px;padding:3px 5px;font-size:11px;border-radius:6px;text-align:center;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:'Noto Sans JP',sans-serif}
-.sl-list{padding:6px 8px;min-height:48px}
-.sl-empty{text-align:center;padding:22px;font-size:12px;color:var(--muted);line-height:1.8}
-.sl-item{display:flex;align-items:center;gap:7px;padding:9px 8px;border-radius:9px;margin-bottom:4px;background:var(--surface2);border:1px solid var(--border);cursor:grab;touch-action:none;transition:.15s}
-.sl-item.mc-item{background:var(--surface3)}
-.sl-item.over{border-color:var(--acc);background:#ff6b1a12}
-.drag-handle{color:var(--muted2);font-size:16px;flex-shrink:0}
-.item-num{width:24px;height:24px;border-radius:50%;background:#ff6b1a22;color:var(--acc);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.mc-item .item-num{background:#3498db22;color:var(--info)}
-.item-body{flex:1;min-width:0}
-.item-name{font-size:13px;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.mc-item .item-name{color:var(--muted);font-weight:400;font-style:italic}
-.item-meta{display:flex;gap:5px;margin-top:3px;flex-wrap:wrap;align-items:center}
-.item-dur{font-size:11px;color:var(--muted)}
-.tag{font-size:10px;padding:1px 7px;border-radius:10px;background:var(--surface3);color:var(--muted);border:1px solid var(--border);white-space:nowrap}
-.tag-slow{background:#1a2e3a;color:#7fc8f8;border-color:#2a4a5a}
-.tag-fast{background:#3a2800;color:#f9ca4a;border-color:#5a3f00}
-.tag-light{background:#3a2000;color:#ff9d5c;border-color:#5a3500}
-.tag-pa{background:#1a2a3a;color:#74b9ff;border-color:#2a4060}
-.item-actions{display:flex;gap:4px;flex-shrink:0}
-.act-btn{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:11px;color:var(--muted);transition:.15s;font-family:'Noto Sans JP',sans-serif}
-.act-btn:hover{border-color:var(--acc);color:var(--acc)}
-.act-btn.del:hover{border-color:var(--danger);color:var(--danger)}
-.add-triggers{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border)}
-.trig-btn{flex:1;padding:10px 8px;border-radius:9px;border:1px dashed var(--border2);background:transparent;color:var(--muted);cursor:pointer;font-size:12px;font-weight:500;transition:.15s;text-align:center;font-family:'Noto Sans JP',sans-serif}
-.trig-btn:hover{border-color:var(--acc);color:var(--acc)}
-.trig-btn.active{border-style:solid;border-color:var(--acc);color:var(--acc);background:#ff6b1a0f}
-.add-form{display:none;padding:14px;border-top:1px solid var(--border);background:var(--surface3)}
-.add-form.open{display:block}
-.form-hd{font-size:12px;font-weight:700;color:var(--acc);margin-bottom:11px;display:flex;justify-content:space-between;align-items:center}
-.form-close{background:transparent;border:none;cursor:pointer;font-size:13px;color:var(--muted);font-family:'Noto Sans JP',sans-serif}
-.form-name-row{display:flex;gap:7px;margin-bottom:10px}
-.form-name-row input{flex:1;font-size:14px}
-.w-dur{width:74px;flex:none;text-align:center}
-.fg{margin-bottom:10px}
-.fg-lbl{font-size:10px;color:var(--muted);font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
-.chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{padding:7px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);cursor:pointer;font-size:12px;position:relative;overflow:hidden;transition:color .15s,border-color .15s,background .15s;-webkit-user-select:none;user-select:none;font-family:'Noto Sans JP',sans-serif}
-.chip.on{background:var(--acc);color:#000;border-color:var(--acc);font-weight:700}
-.chip:hover:not(.on){color:var(--text)}
-.chip .rpl{position:absolute;border-radius:50%;background:rgba(255,255,255,.45);transform:scale(0);animation:rpl .35s ease-out forwards;pointer-events:none}
-@keyframes rpl{to{transform:scale(4);opacity:0}}
-@keyframes popscale{0%{transform:scale(1)}50%{transform:scale(1.11)}100%{transform:scale(1)}}
-.chip.pop{animation:popscale .18s ease-out}
-.add-confirm{width:100%;padding:12px;border-radius:9px;border:none;background:var(--acc);color:#000;font-size:14px;font-weight:700;cursor:pointer;margin-top:6px;transition:.15s;font-family:'Noto Sans JP',sans-serif}
-.add-confirm:hover{background:var(--acc2)}
-input[type=text],input[type=tel],input[type=number],input[type=date],textarea{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 12px;font-size:14px;font-family:'Noto Sans JP',sans-serif;outline:none;transition:.2s;width:100%}
-input:focus,textarea:focus{border-color:var(--acc);background:var(--surface3)}
-input::placeholder,textarea::placeholder{color:var(--muted2)}
-input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5)}
-.send-btn{width:100%;padding:16px;border-radius:10px;border:none;background:#27ae60;color:#fff;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:.15s;margin-bottom:8px;font-family:'Noto Sans JP',sans-serif;letter-spacing:.03em}
-.send-btn:hover{background:#229954;transform:translateY(-1px)}
-.send-btn:active{transform:translateY(0)}
-.send-btn:disabled{background:var(--surface3);color:var(--muted2);cursor:not-allowed}
-.send-btn:not(:disabled){box-shadow:0 4px 16px rgba(46,204,113,.35);animation:send-pulse 2s ease-in-out infinite}
-@keyframes send-pulse{0%,100%{box-shadow:0 4px 16px rgba(46,204,113,.35)}50%{box-shadow:0 4px 24px rgba(46,204,113,.6)}}
-.send-result{padding:11px 14px;border-radius:9px;font-size:13px;text-align:center;margin-bottom:10px;display:none;line-height:1.6}
-.send-ok{background:#0d2b1a;color:var(--success);border:1px solid #1a4a2a}
-.send-err{background:#2b0d0d;color:var(--danger);border:1px solid #4a1a1a}
-.output-pre{padding:12px 14px;font-size:12px;line-height:1.9;color:var(--text);white-space:pre-wrap;font-family:'Courier New',monospace;overflow-x:auto;display:none}
-.output-pre.open{display:block}
-.btn-sm{padding:5px 11px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;font-size:11px;transition:.15s;font-family:'Noto Sans JP',sans-serif}
-.btn-sm:hover{border-color:var(--acc);color:var(--acc)}
-/* POPUP */
-.pov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:.2s}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none}
+:root{--bg:#0f0f0f;--surface:#1a1a1a;--surface2:#222;--surface3:#2a2a2a;--border:#333;--border2:#444;--acc:#ff6b1a;--acc2:#ff9d5c;--text:#f0ede8;--muted:#888;--muted2:#555;--success:#2ecc71;--danger:#e74c3c;--info:#3498db;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:13px;padding-bottom:40px}
+nav{background:#0a0a0a;border-bottom:1px solid var(--border);padding:10px 14px;position:sticky;top:0;z-index:100}
+.nav-inner{max-width:700px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--acc);letter-spacing:.1em}
+.wrap{max-width:700px;margin:0 auto;padding:12px 12px 0}
+.band-tabs{display:flex;gap:6px;margin-bottom:12px}
+.btab{flex:1;padding:10px 6px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;font-size:12px;font-weight:500;text-align:center;transition:.15s;font-family:'Noto Sans JP',sans-serif;line-height:1.4}
+.btab.on{background:var(--acc);color:#000;border-color:var(--acc);font-weight:700}
+.btab:hover:not(.on){border-color:var(--acc);color:var(--acc)}
+.hint{font-size:11px;color:var(--muted);margin-bottom:8px;padding:7px 10px;background:var(--surface);border-radius:8px;line-height:1.6;border:1px solid var(--border)}
+.palette{display:flex;flex-wrap:wrap;gap:5px;padding:9px;background:var(--surface);border-radius:10px;margin-bottom:8px;border:1px solid var(--border)}
+.pi{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 8px;border-radius:8px;border:1px solid var(--border);background:var(--surface2);cursor:pointer;transition:.15s;min-width:44px}
+.pi:hover{border-color:var(--acc)}.pi:active{transform:scale(.95)}
+.pi-icon{font-size:16px;line-height:1}.pi-lbl{font-size:9px;color:var(--muted);text-align:center;line-height:1.2}
+.toolbar{display:flex;gap:6px;margin-bottom:7px;flex-wrap:wrap;align-items:center}
+.tb{padding:5px 11px;border-radius:7px;border:1px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer;font-size:11px;transition:.15s;font-family:'Noto Sans JP',sans-serif}
+.tb:hover{border-color:var(--acc);color:var(--acc)}
+.trash{text-align:center;padding:6px;font-size:11px;color:var(--muted);border:1px dashed var(--border);border-radius:8px;margin-bottom:7px;transition:.2s}
+.trash.hot{border-color:var(--danger);color:var(--danger);background:rgba(231,76,60,.08)}
+.sw{border-radius:10px;overflow:visible;border:1px solid var(--border)}
+#cv{display:block;width:100%;touch-action:none;border-radius:10px}
+.slbl{display:flex;justify-content:space-between;padding:5px 4px 0;font-size:10px;color:var(--muted)}
+.members{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin-top:10px}
+.members-title{font-size:10px;color:var(--acc);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
+.mrow{display:grid;grid-template-columns:110px 1fr;gap:6px;margin-bottom:5px;font-size:12px}
+.mpart{color:var(--muted)}.mname{color:var(--text);font-weight:500}
+.pov{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:.2s}
 .pov.open{opacity:1;pointer-events:all}
-.pop{background:var(--surface);border-radius:18px 18px 0 0;width:100%;max-width:600px;padding:18px 16px 36px;transform:translateY(40px);transition:.25s;border-top:1px solid var(--border);max-height:88vh;overflow-y:auto}
+.pop{background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-width:500px;padding:18px 14px 32px;transform:translateY(40px);transition:.25s;border-top:1px solid var(--border);max-height:85vh;overflow-y:auto}
 .pov.open .pop{transform:translateY(0)}
-.pop-hd{font-size:16px;font-weight:700;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;color:var(--text)}
-.pop-close{background:var(--surface2);border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:13px;color:var(--muted);display:flex;align-items:center;justify-content:center;font-family:'Noto Sans JP',sans-serif}
-.pfg{margin-bottom:13px}
-.pfl{font-size:11px;color:var(--muted);font-weight:500;letter-spacing:.05em;display:block;margin-bottom:6px;text-transform:uppercase}
-.p2col{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:13px}
-.brow{display:flex;gap:9px;margin-top:16px}
-.btn-acc{padding:11px;border-radius:9px;border:none;cursor:pointer;font-size:13px;font-weight:700;flex:1;background:var(--acc);color:#000;font-family:'Noto Sans JP',sans-serif}
-.btn-del{padding:11px;border-radius:9px;border:1px solid #5a1a1a;cursor:pointer;font-size:13px;font-weight:700;flex:1;background:#2b0d0d;color:var(--danger);font-family:'Noto Sans JP',sans-serif}
-/* ADD BAND POPUP */
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--surface2);border:1px solid var(--acc);color:var(--text);padding:10px 18px;border-radius:10px;font-size:13px;opacity:0;transition:.3s;z-index:999;pointer-events:none;white-space:nowrap}
+.ph{font-size:15px;font-weight:700;margin-bottom:13px;display:flex;justify-content:space-between;align-items:center;color:var(--text)}
+.pc{background:var(--surface2);border:none;border-radius:50%;width:28px;height:28px;cursor:pointer;font-size:13px;color:var(--muted);display:flex;align-items:center;justify-content:center;font-family:'Noto Sans JP',sans-serif}
+.fg{margin-bottom:11px}
+.fl{font-size:10px;color:var(--muted);font-weight:700;letter-spacing:.05em;display:block;margin-bottom:5px;text-transform:uppercase}
+input{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 12px;font-size:14px;font-family:'Noto Sans JP',sans-serif;outline:none;transition:.2s;width:100%}
+input:focus{border-color:var(--acc)}
+input::placeholder{color:var(--muted2)}
+.chips{display:flex;flex-wrap:wrap;gap:5px}
+.chip{padding:6px 12px;border-radius:20px;border:1px solid var(--border);background:var(--surface2);color:var(--muted);cursor:pointer;font-size:12px;transition:.15s;font-family:'Noto Sans JP',sans-serif}
+.chip.on{background:var(--acc);color:#000;border-color:var(--acc);font-weight:700}
+.chip:hover:not(.on){color:var(--text);border-color:var(--border2)}
+.brow{display:flex;gap:8px;margin-top:14px}
+.bacc{padding:10px;border-radius:9px;border:none;cursor:pointer;font-size:13px;font-weight:700;flex:1;background:var(--acc);color:#000;font-family:'Noto Sans JP',sans-serif}
+.bdel{padding:10px;border-radius:9px;border:1px solid #5a1a1a;cursor:pointer;font-size:13px;font-weight:700;flex:1;background:#2b0d0d;color:var(--danger);font-family:'Noto Sans JP',sans-serif}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(50px);background:var(--surface2);border:1px solid var(--acc);color:var(--text);padding:9px 16px;border-radius:10px;font-size:12px;opacity:0;transition:.3s;z-index:999;pointer-events:none;white-space:nowrap}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 </style>
 </head>
 <body>
-
-<nav>
-  <div class="nav-inner">
-    <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
-      <span class="nav-logo">桜牙伝</span>
-      <button class="nav-back" id="nav-back" onclick="goTop()">← 戻る</button>
-      <button class="edit-mode-btn" id="edit-mode-btn" onclick="toggleEditMode()" style="display:none">✏️ 編集</button>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px">
-      <div style="text-align:right">
-        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--text);letter-spacing:.05em;line-height:1" id="nav-clock">--:--</div>
-        <div style="font-size:9px;color:var(--muted);margin-top:1px" id="nav-next"></div>
-      </div>
-      <span class="save-indicator">
-        <span class="save-dot" id="save-dot"></span>
-        <span id="save-label" style="display:none"></span>
-      </span>
-    </div>
+<nav><div class="nav-inner"><span class="logo">🎸 ステージセッティング</span><a href="index.html" style="font-size:12px;color:var(--muted);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:7px;transition:.15s" onmouseover="this.style.borderColor='#ff6b1a';this.style.color='#ff6b1a'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">← セトリに戻る</a></div></nav>
+<div class="wrap">
+  <div class="band-tabs">
+    <button class="btab on" onclick="sw('gg')">グッバイ<br>グッピー</button>
+    <button class="btab" onclick="sw('bpc')">Bull pain<br>catcher</button>
+    <button class="btab" onclick="sw('shika')">鹿ROCK</button>
   </div>
-</nav>
-
-<!-- ===== TOP PAGE ===== -->
-<div class="page active" id="page-top">
-  <div class="top-hero">
-    <div class="top-event-name">桜牙伝 STAGE EVENT</div>
-    <div class="top-event-sub">第53回 江刺甚句まつり　おまつり広場ステージ</div>
+  <div class="hint">👆 パレットから追加 ／ ドラッグで移動 ／ <b>ステージ外へドロップで削除</b> ／ タップで詳細編集</div>
+  <div class="palette" id="pal"></div>
+  <div class="trash" id="trash">🗑 ステージ外へドロップで削除</div>
+  <div class="toolbar">
+    <button class="tb" onclick="resetBand()">↩ 初期配置</button>
+    <button class="tb" onclick="clearAll()">全クリア</button>
+    <button class="tb" onclick="expTxt()">📋 テキスト出力</button>
+    <span style="font-size:11px;color:var(--muted);margin-left:auto" id="cnt"></span>
   </div>
-
-  <!-- 時計 -->
-  <div class="clock-card">
-    <div>
-      <div class="clock-display" id="clock-time">--:--:--</div>
-      <div style="font-size:11px;color:var(--muted);margin-top:3px" id="clock-date">読み込み中...</div>
-    </div>
-    <div class="clock-right">
-      <div class="next-label" id="next-label">次の出番</div>
-      <div class="next-band" id="next-band">―</div>
-      <div class="next-time" id="next-time"></div>
-    </div>
-  </div>
-
-  <!-- タイムライン（アコーディオン） -->
-  <div class="timeline-card">
-    <div class="timeline-title" onclick="toggleTimeline()" style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;margin-bottom:0">
-      <span>📅 5月3日（日）タイムスケジュール</span>
-      <span id="tl-chevron" style="font-size:16px;color:var(--acc);transition:.2s">›</span>
-    </div>
-    <div id="timeline-rows" style="display:none;margin-top:12px"></div>
-  </div>
-
-  <div class="top-section-label">🎸 あなたのバンドを選んでください</div>
-  <div class="band-select-list" id="band-select-list"></div>
-  <button class="add-band-btn" onclick="showAddBandPopup()">＋ バンドを追加する</button>
+  <div class="sw"><canvas id="cv"></canvas></div>
+  <div class="slbl"><span>← 下手（お客から見て左）</span><span>上手（お客から見て右）→</span></div>
+  <div class="members" id="members"></div>
 </div>
 
-<!-- ===== SETLIST PAGE ===== -->
-<div class="page" id="page-setlist">
-
-  <div class="band-hero">
-    <div class="band-hero-name" id="hero-band-name">バンド名</div>
-    <div class="band-hero-sub" id="hero-band-sub">江刺甚句まつり　2026.5.3</div>
-  </div>
-
-  <div class="summary">
-    <div class="sum-cell"><div class="sum-lbl">総時間</div><div class="sum-val" id="s-total">0:00</div></div>
-    <div class="sum-cell"><div class="sum-lbl">曲数</div><div class="sum-val" id="s-songs">0曲</div></div>
-    <div class="sum-cell"><div class="sum-lbl">残り時間</div><div class="sum-val" id="s-left">30:00</div></div>
-  </div>
-  <div class="tl-bar" id="tl-bar"></div>
-
-  <div class="panel">
-    <div class="panel-hd">
-      <div class="panel-title">🎵 セットリスト</div>
-      <div class="limit-row">持ち時間 <input type="number" id="limit" value="30" min="5" max="90" oninput="render()"> 分</div>
-    </div>
-    <div id="edit-lock-banner" class="edit-lock-banner" style="margin:6px 8px 0;display:none">
-      <span>🔒 閲覧モード — 誤操作防止中</span>
-      <button class="edit-mode-btn on" onclick="toggleEditMode()" style="padding:4px 10px;font-size:11px">✏️ 編集する</button>
-    </div>
-    <div id="sl-list" class="sl-list"><div class="sl-empty">まだ曲がありません<br>下の「曲を追加」から追加してください</div></div>
-    <div class="add-triggers" id="add-triggers">
-      <button class="trig-btn" id="trig-song" onclick="openForm('song')">🎵 曲を追加</button>
-      <button class="trig-btn" id="trig-mc" onclick="openForm('mc')">🎤 MC</button>
-      <button class="trig-btn" id="trig-se" onclick="openForm('se')">🔄 SE/転換</button>
-    </div>
-    <div class="add-form" id="add-form">
-      <div class="form-hd"><span id="form-title">曲を追加</span><button class="form-close" onclick="closeForm()">✕ 閉じる</button></div>
-      <div class="form-name-row">
-        <input type="text" id="a-name" placeholder="曲名を入力">
-        <input type="text" id="a-dur" placeholder="3:45" class="w-dur">
-      </div>
-      <div class="fg" id="f-tempo"><div class="fg-lbl">テンポ</div>
-        <div class="chips" id="a-tempo">
-          <button class="chip" onclick="pick(this,'a-tempo',event)">🐢 遅い</button>
-          <button class="chip on" onclick="pick(this,'a-tempo',event)">🚶 普通</button>
-          <button class="chip" onclick="pick(this,'a-tempo',event)">🔥 速い</button>
-        </div>
-      </div>
-      <div class="fg" id="f-light"><div class="fg-lbl">💡 照明イメージ</div>
-        <div class="chips" id="a-light">
-          <button class="chip on" onclick="pick(this,'a-light',event)">おまかせ</button>
-          <button class="chip" onclick="pick(this,'a-light',event)">暖色系</button>
-          <button class="chip" onclick="pick(this,'a-light',event)">クール系</button>
-          <button class="chip" onclick="pick(this,'a-light',event)">暗め</button>
-          <button class="chip" onclick="pick(this,'a-light',event)">明るく</button>
-          <button class="chip" onclick="pick(this,'a-light',event)">ストロボOK</button>
-        </div>
-      </div>
-      <div class="fg" id="f-pa"><div class="fg-lbl">🎚 PAへの希望</div>
-        <div class="chips" id="a-pa">
-          <button class="chip on" onclick="pick(this,'a-pa',event)">おまかせ</button>
-          <button class="chip" onclick="pick(this,'a-pa',event)">Vo強め</button>
-          <button class="chip" onclick="pick(this,'a-pa',event)">Vo細め</button>
-          <button class="chip" onclick="pick(this,'a-pa',event)">Gt前に出して</button>
-          <button class="chip" onclick="pick(this,'a-pa',event)">Ba前に出して</button>
-          <button class="chip" onclick="pick(this,'a-pa',event)">Dr前に出して</button>
-          <button class="chip" onclick="pick(this,'a-pa',event)">アコギに持ち替え</button>
-          <button class="chip" onclick="pick(this,'a-pa',event)">静かに始まる</button>
-        </div>
-      </div>
-      <div class="fg" id="f-note" style="display:none"><div class="fg-lbl">内容・メモ</div>
-        <input type="text" id="a-note" placeholder="例：自己紹介・次の曲の説明など">
-      </div>
-      <button class="add-confirm" onclick="doAdd()">追加する</button>
-    </div>
-  </div>
-
-  <!-- モードバナー -->
-  <div class="mode-banner" id="mode-banner">
-    <span class="mode-banner-label" id="mode-banner-label">🔒 閲覧モード</span>
-    <button class="mode-banner-btn" id="mode-banner-btn" onclick="toggleEditMode()">✏️ 編集する</button>
-  </div>
-
-  <!-- 送信エリア -->
-  <div id="send-box" style="background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px">
-    <div style="font-size:11px;font-weight:700;color:var(--acc);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">📤 スタッフへ共有</div>
-    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.6">入力が終わったら必ず送信してください。<br>PAスタッフ・主催者に届きます。</div>
-    <div id="send-result" class="send-result"></div>
-    <button class="send-btn" id="send-btn" onclick="sendToSheets()" disabled style="margin-bottom:8px">
-      <span>📊</span><span id="send-lbl">送信する（必須）</span>
-    </button>
-    <div id="send-status" style="text-align:center;font-size:12px;color:var(--muted)">まだ送信されていません</div>
-  </div>
-
-  <div class="panel pa-sheet">
-    <div class="pa-sheet-hd" onclick="togglePaSheet()">
-      <div class="panel-title">🎚 PA・照明用セトリ</div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <button class="btn-sm" onclick="event.stopPropagation();copyOut()">📋 コピー</button>
-        <span id="pa-chevron" style="font-size:18px;color:var(--acc);transition:.25s;line-height:1">›</span>
-      </div>
-    </div>
-    <div class="pa-sheet-body" id="pa-sheet-body">
-      <div id="pa-sheet-rows"></div>
-      <div class="pa-sheet-summary" id="pa-sheet-summary"></div>
-    </div>
-  </div>
-
-</div>
-
-<!-- 曲編集ポップアップ -->
 <div class="pov" id="pov">
 <div class="pop">
-  <div class="pop-hd"><span id="pop-ttl">曲を編集</span><button class="pop-close" onclick="closeP()">✕</button></div>
-  <div class="pfg"><label class="pfl">曲名 / 内容</label><input type="text" id="pe-name" placeholder="曲名"></div>
-  <div class="p2col">
-    <div><label class="pfl">時間（分:秒）</label><input type="text" id="pe-dur" placeholder="3:45"></div>
-    <div><label class="pfl">テンポ</label>
-      <div class="chips" id="pe-tempo">
-        <button class="chip" onclick="pick(this,'pe-tempo',event)">🐢</button>
-        <button class="chip on" onclick="pick(this,'pe-tempo',event)">🚶</button>
-        <button class="chip" onclick="pick(this,'pe-tempo',event)">🔥</button>
-      </div>
-    </div>
+  <div class="ph"><span id="pttl">機材を編集</span><button class="pc" onclick="closeP()">✕</button></div>
+  <div class="fg"><label class="fl">型番・機種名</label><input type="text" id="pm" placeholder="例：Koch コンボ / マークベース121"></div>
+  <div class="fg"><label class="fl">持ち込み / 会場借り</label>
+    <div class="chips" id="co"><button class="chip on" onclick="tc(this,'co')">会場借り</button><button class="chip" onclick="tc(this,'co')">持ち込み</button><button class="chip" onclick="tc(this,'co')">レンタル</button></div>
   </div>
-  <div id="pe-song-opts">
-    <div class="pfg"><label class="pfl">💡 照明イメージ</label>
-      <div class="chips" id="pe-light">
-        <button class="chip on" onclick="pick(this,'pe-light',event)">おまかせ</button>
-        <button class="chip" onclick="pick(this,'pe-light',event)">暖色系</button>
-        <button class="chip" onclick="pick(this,'pe-light',event)">クール系</button>
-        <button class="chip" onclick="pick(this,'pe-light',event)">暗め</button>
-        <button class="chip" onclick="pick(this,'pe-light',event)">明るく</button>
-        <button class="chip" onclick="pick(this,'pe-light',event)">ストロボOK</button>
-      </div>
-    </div>
-    <div class="pfg"><label class="pfl">🎚 PAへの希望</label>
-      <div class="chips" id="pe-pa">
-        <button class="chip on" onclick="pick(this,'pe-pa',event)">おまかせ</button>
-        <button class="chip" onclick="pick(this,'pe-pa',event)">Vo強め</button>
-        <button class="chip" onclick="pick(this,'pe-pa',event)">Vo細め</button>
-        <button class="chip" onclick="pick(this,'pe-pa',event)">Gt前に出して</button>
-        <button class="chip" onclick="pick(this,'pe-pa',event)">Ba前に出して</button>
-        <button class="chip" onclick="pick(this,'pe-pa',event)">Dr前に出して</button>
-        <button class="chip" onclick="pick(this,'pe-pa',event)">アコギに持ち替え</button>
-        <button class="chip" onclick="pick(this,'pe-pa',event)">静かに始まる</button>
-      </div>
-    </div>
+  <div id="drum-s" style="display:none">
+    <div class="fg"><label class="fl">タム数</label><div class="chips" id="ctom"><button class="chip" onclick="tc(this,'ctom')">1タム</button><button class="chip on" onclick="tc(this,'ctom')">2タム</button><button class="chip" onclick="tc(this,'ctom')">3タム</button></div></div>
+    <div class="fg"><label class="fl">ペダル</label><div class="chips" id="cped"><button class="chip on" onclick="tc(this,'cped')">1バス</button><button class="chip" onclick="tc(this,'cped')">ツーバス（持込）</button><button class="chip" onclick="tc(this,'cped')">ツーバス（借り）</button></div></div>
+    <div class="fg"><label class="fl">シンバル</label><div class="chips" id="ccym"><button class="chip on" onclick="tc(this,'ccym')">会場のまま</button><button class="chip" onclick="tc(this,'ccym')">一部持込</button><button class="chip" onclick="tc(this,'ccym')">全部持込</button></div></div>
+    <div class="fg"><label class="fl">MTR同期</label><div class="chips" id="cmtr"><button class="chip on" onclick="tc(this,'cmtr')">なし</button><button class="chip" onclick="tc(this,'cmtr')">MTR同期あり</button></div></div>
   </div>
-  <div class="pfg"><label class="pfl">その他メモ</label><input type="text" id="pe-note" placeholder="照明・演出・その他"></div>
-  <div class="brow">
-    <button class="btn-del" onclick="delItem()">削除</button>
-    <button class="btn-acc" onclick="saveItem()">保存</button>
+  <div id="gt-s" style="display:none">
+    <div class="fg"><label class="fl">使用アンプ</label><div class="chips" id="camp"><button class="chip on" onclick="tc(this,'camp')">上手 Amp</button><button class="chip" onclick="tc(this,'camp')">下手 Amp</button><button class="chip" onclick="tc(this,'camp')">DI直</button><button class="chip" onclick="tc(this,'camp')">持込アンプ</button></div></div>
+    <div class="fg"><label class="fl">立ち位置</label><div class="chips" id="cstd"><button class="chip" onclick="tc(this,'cstd')">下手</button><button class="chip on" onclick="tc(this,'cstd')">センター</button><button class="chip" onclick="tc(this,'cstd')">上手</button></div></div>
+    <div class="fg"><label class="fl">コーラス</label><div class="chips" id="ccho"><button class="chip on" onclick="tc(this,'ccho')">コーラスなし</button><button class="chip" onclick="tc(this,'ccho')">コーラスあり</button></div></div>
   </div>
+  <div id="vo-s" style="display:none">
+    <div class="fg"><label class="fl">マイク種別</label><div class="chips" id="cmic"><button class="chip on" onclick="tc(this,'cmic')">SM58系</button><button class="chip" onclick="tc(this,'cmic')">コンデンサー</button><button class="chip" onclick="tc(this,'cmic')">ワイヤレス</button><button class="chip" onclick="tc(this,'cmic')">持込</button></div></div>
+  </div>
+  <div id="mon-s" style="display:none">
+    <div class="fg"><label class="fl">返し内容</label><div class="chips" id="cmon"><button class="chip on" onclick="tc(this,'cmon')">PAに任せる</button><button class="chip" onclick="tc(this,'cmon')">Vo大きめ</button><button class="chip" onclick="tc(this,'cmon')">Dr大きめ</button><button class="chip" onclick="tc(this,'cmon')">全体バランス</button></div></div>
+  </div>
+  <div class="fg"><label class="fl">メモ</label><input type="text" id="pn" placeholder="電源タップ必要 / 上手端に設置 など"></div>
+  <div class="brow"><button class="bdel" onclick="delItem()">削除</button><button class="bacc" onclick="saveItem()">保存</button></div>
 </div>
 </div>
-
-<!-- バンド追加ポップアップ -->
-<div class="pov" id="pov-add-band">
-<div class="pop">
-  <div class="pop-hd"><span>バンドを追加</span><button class="pop-close" onclick="closeAddBand()">✕</button></div>
-  <div class="pfg"><label class="pfl">バンド名</label><input type="text" id="new-band-name" placeholder="バンド名を入力"></div>
-  <div class="pfg"><label class="pfl">持ち時間（分）</label><input type="number" id="new-band-limit" value="30" min="5" max="90"></div>
-  <button class="btn-acc" onclick="addBand()" style="width:100%;padding:12px;border-radius:9px;font-size:14px">追加する</button>
-</div>
-</div>
-
 <div class="toast" id="toast"></div>
-<div id="drag-ghost"><span class="ghost-num" id="ghost-num"></span><span class="ghost-name" id="ghost-name"></span></div>
 
 <script>
-const GAS_URL='https://script.google.com/macros/s/AKfycbzmY7_MHDnBdea_WuRuR48V0adMa4JTbWZ-ULtGvMvQ8dieVLRoBguyHA-X52YWzTK4/exec';
-const SK='sh_bands_v3';
+const D={
+  drum:{lbl:'Dr',sub:'ドラム',col:'#c0392b',w:56,h:44,cat:'drum'},
+  ba:{lbl:'B.A',sub:'ベースAmp',col:'#1a5276',w:38,h:30,cat:'amp'},
+  ga_r:{lbl:'G.A',sub:'上手Amp',col:'#1e8449',w:38,h:30,cat:'amp'},
+  ga_l:{lbl:'G.A',sub:'下手Amp',col:'#1e8449',w:38,h:30,cat:'amp'},
+  vo:{lbl:'Vo',sub:'ボーカル',col:'#7d3c98',w:28,h:44,cat:'person'},
+  gt:{lbl:'Gt',sub:'ギター',col:'#1e8449',w:28,h:44,cat:'person'},
+  ba_p:{lbl:'Ba',sub:'ベース',col:'#1a5276',w:28,h:44,cat:'person'},
+  cho:{lbl:'Cho',sub:'コーラス',col:'#9b59b6',w:28,h:44,cat:'person'},
+  mon:{lbl:'M',sub:'モニター',col:'#d35400',w:36,h:20,cat:'mon'},
+  kbd:{lbl:'Kbd',sub:'キーボード',col:'#148f77',w:50,h:24,cat:'amp'},
+  di:{lbl:'DI',sub:'DI BOX',col:'#7f8c8d',w:22,h:20,cat:'amp'},
+};
+const PAL=['drum','ba','ga_r','ga_l','vo','gt','ba_p','cho','mon','kbd','di'];
+const EMJ={drum:'🥁',ba:'🔊',ga_r:'🔊',ga_l:'🔊',vo:'🎤',gt:'🎸',ba_p:'🎸',cho:'🎙',mon:'📺',kbd:'🎹',di:'🔌'};
 
-// 初期バンドデータ
-const DEFAULT_BANDS = [
-  {
-    id:'gg', name:'グッバイグッピー', limit:30,
-    sentAt:null, updatedAt:new Date().toISOString(),
-    items:[
-      {id:1,type:'song',name:'ブルースター',       dur:'3:36',tempo:'普通',light:'おまかせ',pa:'おまかせ',note:''},
-      {id:2,type:'song',name:'桜の花は知っている', dur:'3:00',tempo:'普通',light:'おまかせ',pa:'おまかせ',note:''},
-      {id:3,type:'song',name:'並木道',             dur:'4:44',tempo:'普通',light:'おまかせ',pa:'おまかせ',note:''},
-      {id:4,type:'song',name:'腕時計',             dur:'4:48',tempo:'普通',light:'おまかせ',pa:'おまかせ',note:''},
-      {id:5,type:'song',name:'夏油',               dur:'5:00',tempo:'普通',light:'おまかせ',pa:'おまかせ',note:''},
-      {id:6,type:'mc',  name:'良太くん登場',       dur:'5:00',tempo:'普通',light:'おまかせ',pa:'おまかせ',note:''},
-      {id:7,type:'song',name:'スタンドバイミー',   dur:'5:00',tempo:'普通',light:'おまかせ',pa:'おまかせ',note:''},
-    ]
-  },
-  {id:'bpc',   name:'Bull Pain Catcher', limit:30, sentAt:null, updatedAt:new Date().toISOString(), items:[]},
-  {id:'shika', name:'鹿ROCK',            limit:30, sentAt:null, updatedAt:new Date().toISOString(), items:[]},
-];
+const BANDS={
+  gg:{name:'グッバイグッピー',members:[{p:'Vo & G1',n:'（〆）'},{p:'G2',n:''},{p:'Ba',n:'カンノ ジュン'},{p:'Dr',n:'ヨシダ ジュンイチ'}],
+    layout:[
+      {t:'ba',xp:.14,yp:.12,model:'マークベース121',own:'持ち込み',note:'下手'},
+      {t:'ga_l',xp:.30,yp:.12,model:'Dr.Z / Kochコンボ',own:'持ち込み',note:'G1用'},
+      {t:'drum',xp:.50,yp:.22,model:'共有',own:'会場借り',tom:'1タム',ped:'1バス',cym:'会場のまま',mtr:'なし'},
+      {t:'ga_r',xp:.78,yp:.12,model:'持込アンプ',own:'持ち込み',note:'G2用 上手'},
+      {t:'ba_p',xp:.22,yp:.58,model:'',own:'持ち込み',amp:'下手 Amp',std:'下手',cho:'コーラスあり',note:'Ba.Cho カンノジュン'},
+      {t:'gt',xp:.44,yp:.60,model:'',own:'会場借り',amp:'下手 Amp',std:'センター',cho:'コーラスなし',note:'G1.Vo'},
+      {t:'cho',xp:.60,yp:.60,model:'',own:'会場借り',mic:'SM58系',note:'Guest.Vo（括弧あり）'},
+      {t:'gt',xp:.76,yp:.55,model:'',own:'持ち込み',amp:'上手 Amp',std:'上手',cho:'コーラスなし',note:'G2'},
+      {t:'mon',xp:.28,yp:.82,model:'',own:'会場借り',mon:'全体バランス'},
+      {t:'mon',xp:.50,yp:.84,model:'',own:'会場借り',mon:'Vo大きめ'},
+      {t:'mon',xp:.72,yp:.82,model:'',own:'会場借り',mon:'全体バランス'},
+    ]},
+  bpc:{name:'Bull pain catcher',members:[{p:'Vo & G',n:'イシカワ ヒロシ'},{p:'G①&Cho',n:'キクチ マサヨシ'},{p:'G②',n:'アントウ ヨウスケ'},{p:'Ba&Cho',n:'サクヤマ トモミチ'},{p:'Dr&Cho',n:'ムラカミ シンヤ'}],
+    layout:[
+      {t:'ba',xp:.14,yp:.11,model:'マークベース121',own:'持ち込み',note:'下手 DI直 サクヤマ'},
+      {t:'ga_l',xp:.28,yp:.11,model:'Dr.Z / Kochコンボ',own:'持ち込み',note:'G① イシカワ'},
+      {t:'drum',xp:.50,yp:.21,model:'',own:'持ち込み',tom:'1タム',ped:'1バス',cym:'全部持込',mtr:'なし',note:'スネア・ペダル・シンバル持込 ムラカミ'},
+      {t:'ga_r',xp:.70,yp:.11,model:'Kochヘッド / Marshallキャビ',own:'持ち込み',note:'G① キクチ'},
+      {t:'ga_r',xp:.84,yp:.11,model:'Diezelヘッド・キャビ',own:'持ち込み',note:'G② アントウ'},
+      {t:'cho',xp:.50,yp:.15,model:'',own:'会場借り',mic:'SM58系',note:'cho センター奥'},
+      {t:'ba_p',xp:.22,yp:.58,model:'',own:'持ち込み',amp:'下手 Amp',std:'下手',cho:'コーラスあり',note:'Ba&Cho サクヤマ'},
+      {t:'gt',xp:.48,yp:.60,model:'',own:'会場借り',amp:'下手 Amp',std:'センター',cho:'コーラスなし',note:'Vo&G イシカワ'},
+      {t:'gt',xp:.72,yp:.55,model:'',own:'持ち込み',amp:'上手 Amp',std:'上手',cho:'コーラスあり',note:'G② アントウ'},
+      {t:'cho',xp:.22,yp:.74,model:'',own:'会場借り',mic:'SM58系',note:'cho 下手'},
+      {t:'vo',xp:.48,yp:.72,model:'',own:'会場借り',mic:'SM58系',note:'Vo&G センター'},
+      {t:'cho',xp:.72,yp:.74,model:'',own:'会場借り',mic:'SM58系',note:'cho 上手'},
+      {t:'mon',xp:.28,yp:.84,model:'',own:'会場借り',mon:'全体バランス'},
+      {t:'mon',xp:.50,yp:.86,model:'',own:'会場借り',mon:'Vo大きめ'},
+      {t:'mon',xp:.72,yp:.84,model:'',own:'会場借り',mon:'全体バランス'},
+    ]},
+  shika:{name:'鹿ROCK',members:[{p:'Gt.Vo',n:'及川 啓介（オイカワ ケイスケ）'},{p:'Gt.(&Ba)',n:'幸野 佑（コウノ タスク）'},{p:'Ba.Key.MC',n:'佐藤 康生（サトウ コウセイ）'},{p:'Dr.Cho',n:'横井 悠人（ヨコイ ハルト）'}],
+    layout:[
+      {t:'ba',xp:.12,yp:.11,model:'',own:'会場借り',note:'下手 BaAmp'},
+      {t:'drum',xp:.50,yp:.21,model:'',own:'持ち込み',tom:'2タム',ped:'1バス',cym:'全部持込',mtr:'MTR同期あり',note:'2タム構成 MTR同期 ヨコイ'},
+      {t:'ga_r',xp:.72,yp:.11,model:'',own:'会場借り',note:'GtAmp 上手①'},
+      {t:'ga_r',xp:.85,yp:.11,model:'',own:'会場借り',note:'GtAmp 上手②'},
+      {t:'kbd',xp:.18,yp:.50,model:'',own:'持ち込み',note:'Key 持込'},
+      {t:'ba_p',xp:.30,yp:.58,model:'',own:'会場借り',amp:'下手 Amp',std:'下手',cho:'コーラスなし',note:'Ba.Key.MC サトウ'},
+      {t:'gt',xp:.50,yp:.60,model:'',own:'会場借り',amp:'上手 Amp',std:'センター',cho:'コーラスなし',note:'Gt.Vo オイカワ'},
+      {t:'gt',xp:.70,yp:.55,model:'',own:'会場借り',amp:'上手 Amp',std:'上手',cho:'コーラスなし',note:'Gt コウノ'},
+      {t:'vo',xp:.30,yp:.72,model:'',own:'会場借り',mic:'SM58系',note:'Ba.Key.MC'},
+      {t:'vo',xp:.50,yp:.72,model:'',own:'会場借り',mic:'SM58系',note:'Gt.Vo'},
+      {t:'vo',xp:.70,yp:.72,model:'',own:'会場借り',mic:'SM58系',note:'Gt'},
+      {t:'mon',xp:.28,yp:.84,model:'',own:'会場借り',mon:'全体バランス'},
+      {t:'mon',xp:.50,yp:.86,model:'',own:'会場借り',mon:'Vo大きめ'},
+      {t:'mon',xp:.72,yp:.84,model:'',own:'会場借り',mon:'全体バランス'},
+    ]}
+};
 
-let bands=[], curId=null, items=[], seq=1, editId=null, formMode=null, editMode=false;
-let dragSrc=null, dragOver=null, touchSrc=null, actx=null, saveTimer=null;
+let cBid='gg',allItems={gg:[],bpc:[],shika:[]},seq=1,editId=null;
+let drag=null,doff={x:0,y:0},moved=false;
+let W=0,H=0,sY=0,sH=0;
+const cv=document.getElementById('cv'),ctx=cv.getContext('2d');
 
-// ===== STORAGE =====
-function getBands(){try{return JSON.parse(localStorage.getItem(SK)||'null');}catch(e){return null;}}
-function saveBands(){try{localStorage.setItem(SK,JSON.stringify(bands));}catch(e){}}
+function mkItems(bid){
+  return BANDS[bid].layout.map(d=>({...d,id:seq++,type:d.t}));
+}
+['gg','bpc','shika'].forEach(b=>{allItems[b]=mkItems(b);});
 
-function initBands(){
-  const saved=getBands();
-  if(saved&&saved.length>0){
-    bands=saved;
-    // 新バンドがデフォルトにあれば追加
-    DEFAULT_BANDS.forEach(d=>{if(!bands.find(b=>b.id===d.id))bands.push(d);});
+// palette
+const palEl=document.getElementById('pal');
+PAL.forEach(k=>{
+  const btn=document.createElement('button');
+  btn.className='pi';
+  btn.innerHTML='<span class="pi-icon">'+EMJ[k]+'</span><span class="pi-lbl">'+D[k].sub+'</span>';
+  btn.onclick=()=>{
+    const x=W*(.3+Math.random()*.4),y=sY+sH*.25+Math.random()*sH*.3;
+    allItems[cBid].push({id:seq++,type:k,x,y,model:'',own:'会場借り',tom:'2タム',ped:'1バス',cym:'会場のまま',mtr:'なし',amp:'上手 Amp',std:'センター',cho:'コーラスなし',mic:'SM58系',mon:'PAに任せる',note:''});
+    draw();
+  };
+  palEl.appendChild(btn);
+});
+
+function sw(id){
+  cBid=id;
+  document.querySelectorAll('.btab').forEach((t,i)=>t.classList.toggle('on',['gg','bpc','shika'][i]===id));
+  renderMembers();draw();
+}
+function resetBand(){
+  if(!confirm('初期配置に戻しますか？'))return;
+  allItems[cBid]=mkItems(cBid);draw();showToast('初期配置に戻しました');
+}
+function clearAll(){if(!confirm('全て削除しますか？'))return;allItems[cBid]=[];draw();}
+
+function renderMembers(){
+  const b=BANDS[cBid];
+  document.getElementById('members').innerHTML='<div class="members-title">👥 '+b.name+' メンバー</div>'+
+    b.members.filter(m=>m.n).map(m=>'<div class="mrow"><span class="mpart">'+m.p+'</span><span class="mname">'+m.n+'</span></div>').join('');
+}
+
+function resize(){
+  const r=cv.parentElement.getBoundingClientRect(),dpr=window.devicePixelRatio||1;
+  W=Math.floor(r.width)||340;H=Math.round(W*.68);
+  cv.width=W*dpr;cv.height=H*dpr;cv.style.width=W+'px';cv.style.height=H+'px';
+  ctx.scale(dpr,dpr);sY=H*.06;sH=H*.78;draw();
+}
+
+function draw(){
+  ctx.clearRect(0,0,W,H);
+  const dk=matchMedia('(prefers-color-scheme:dark)').matches;
+  ctx.fillStyle=dk?'#1c1c1c':'#f5f3ee';ctx.fillRect(0,sY,W,sH);
+  ctx.strokeStyle=dk?'#444':'#bbb';ctx.lineWidth=1;ctx.strokeRect(0,sY,W,sH);
+  ctx.fillStyle=dk?'#888':'#777';ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+  ctx.fillText('STAGE',W/2,sY+12);
+  ctx.fillStyle=dk?'#141414':'#ebe9e4';ctx.fillRect(0,sY+sH,W,H-(sY+sH));
+  ctx.fillStyle=dk?'#888':'#777';ctx.font='10px sans-serif';ctx.fillText('客席',W/2,sY+sH+14);
+  const pw=40,ph=24,py=sY+sH-ph-4;
+  dbox(4,py,pw,ph,'#555','#fff','PA');dbox(W-4-pw,py,pw,ph,'#555','#fff','PA');
+  const items=allItems[cBid];
+  items.forEach(it=>drawIt(it,dk));
+  document.getElementById('trash').className='trash'+(drag&&isOut(drag)?' hot':'');
+  document.getElementById('cnt').textContent=items.length+'個配置中';
+}
+
+function dbox(x,y,w,h,fill,tc,lbl){
+  ctx.fillStyle=fill;ctx.strokeStyle='#444';ctx.lineWidth=.8;
+  ctx.beginPath();ctx.roundRect(x,y,w,h,3);ctx.fill();ctx.stroke();
+  ctx.fillStyle=tc;ctx.font='bold 10px sans-serif';ctx.textAlign='center';
+  ctx.fillText(lbl,x+w/2,y+h/2+4);
+}
+
+function micStand(cx,cy,col,sz){
+  const r=sz*.38,ls=sz*.55;
+  ctx.strokeStyle=col;ctx.lineWidth=1.4;
+  ctx.beginPath();ctx.arc(cx,cy-ls,r,0,Math.PI*2);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx,cy-ls-r);ctx.lineTo(cx,cy-ls+r);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx-r,cy-ls);ctx.lineTo(cx+r,cy-ls);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx,cy-ls+r);ctx.lineTo(cx,cy+ls*.3);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx-r*.9,cy+ls*.3);ctx.lineTo(cx+r*.9,cy+ls*.3);ctx.stroke();
+}
+
+function drawIt(it,dk){
+  const d=D[it.type];if(!d)return;
+  const x=it.x!==undefined?it.x:it.xp*W;
+  const y=it.y!==undefined?it.y:it.yp*W;
+  if(it.x===undefined){it.x=x;it.y=y;}
+  const sel=editId===it.id;
+  const fading=drag&&drag.id===it.id&&isOut(drag);
+  if(fading){ctx.save();ctx.globalAlpha=.3;}
+
+  if(d.cat==='person'){
+    const hr=d.h*.22,bh=d.h*.38,bw=d.w*.42;
+    if(sel){ctx.save();ctx.shadowColor='#ff6b1a';ctx.shadowBlur=8;}
+    ctx.fillStyle=d.col+'dd';ctx.strokeStyle=sel?'#ff6b1a':'rgba(255,255,255,.2)';ctx.lineWidth=sel?2:.8;
+    ctx.beginPath();ctx.ellipse(x,y+bh*.2,bw,bh,0,0,Math.PI*2);ctx.fill();ctx.stroke();
+    ctx.beginPath();ctx.arc(x,y-hr*.6,hr,0,Math.PI*2);ctx.fill();ctx.stroke();
+    if(sel)ctx.restore();
+    ctx.fillStyle='#fff';ctx.font='bold 9px sans-serif';ctx.textAlign='center';
+    ctx.fillText(d.lbl,x,y+bh*.25);
+    if(it.cho==='コーラスあり'){
+      ctx.fillStyle='rgba(155,89,182,.85)';
+      ctx.beginPath();ctx.roundRect(x-14,y-bh*.6-12,28,12,2);ctx.fill();
+      ctx.fillStyle='#fff';ctx.font='7px sans-serif';ctx.textAlign='center';ctx.fillText('Cho',x,y-bh*.6-3);
+    }
+    micStand(x,y+bh*.52,'rgba(255,255,255,.7)',13);
+    // amp line
+    if((it.type==='gt'||it.type==='ba_p')&&it.amp&&it.amp!=='DI直'){
+      const isR=it.amp.includes('上手');
+      const tgt=allItems[cBid].find(i=>(i.type==='ga_r'&&isR)||(i.type==='ga_l'&&!isR));
+      if(tgt){
+        const tx=tgt.x??tgt.xp*W,ty=tgt.y??tgt.yp*W;
+        ctx.save();ctx.strokeStyle='rgba(255,210,60,.4)';ctx.lineWidth=1.2;ctx.setLineDash([4,3]);
+        ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(tx,ty);ctx.stroke();ctx.restore();
+      }
+    }
+  } else if(d.cat==='drum'){
+    if(sel){ctx.save();ctx.shadowColor='#ff6b1a';ctx.shadowBlur=8;}
+    ctx.fillStyle='#c0392bcc';ctx.strokeStyle=sel?'#ff6b1a':'rgba(255,255,255,.15)';ctx.lineWidth=sel?2:.8;
+    ctx.beginPath();ctx.roundRect(x-d.w/2,y-d.h/2,d.w,d.h,4);ctx.fill();ctx.stroke();
+    if(sel)ctx.restore();
+    ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText('Dr',x,y-2);
+    const tgs=[];
+    if(it.tom)tgs.push(it.tom.replace('タム','T'));
+    if(it.ped&&it.ped.includes('ツー'))tgs.push('2BD');
+    if(it.mtr&&it.mtr.includes('MTR'))tgs.push('MTR');
+    if(it.cym&&!it.cym.includes('会場'))tgs.push('CYM↑');
+    if(tgs.length){ctx.font='8px sans-serif';ctx.fillStyle='#7fc8f8';ctx.fillText(tgs.join(' '),x,y+10);}
+  } else if(d.cat==='mon'){
+    if(sel){ctx.save();ctx.shadowColor='#ff6b1a';ctx.shadowBlur=8;}
+    ctx.fillStyle='#d35400cc';ctx.strokeStyle=sel?'#ff6b1a':'rgba(0,0,0,.2)';ctx.lineWidth=sel?2:.8;
+    ctx.beginPath();ctx.moveTo(x-d.w/2,y+d.h/2);ctx.lineTo(x+d.w/2,y+d.h/2);ctx.lineTo(x+d.w/2-4,y-d.h/2);ctx.lineTo(x-d.w/2+4,y-d.h/2);ctx.closePath();ctx.fill();ctx.stroke();
+    if(sel)ctx.restore();
+    ctx.fillStyle='#fff';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText('M',x,y+5);
   } else {
-    bands=JSON.parse(JSON.stringify(DEFAULT_BANDS));
-  }
-  saveBands();
-}
-
-// ===== AUDIO =====
-function getAC(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();return actx;}
-function playPop(on){try{const ac=getAC(),osc=ac.createOscillator(),g=ac.createGain();osc.connect(g);g.connect(ac.destination);osc.type='sine';osc.frequency.setValueAtTime(on?880:660,ac.currentTime);osc.frequency.exponentialRampToValueAtTime(on?1100:500,ac.currentTime+0.06);g.gain.setValueAtTime(0,ac.currentTime);g.gain.linearRampToValueAtTime(0.1,ac.currentTime+0.008);g.gain.exponentialRampToValueAtTime(0.0001,ac.currentTime+0.12);osc.start(ac.currentTime);osc.stop(ac.currentTime+0.13);}catch(e){}}
-function vib(on){try{navigator.vibrate&&navigator.vibrate(on?[18]:[8]);}catch(e){}}
-
-// ===== CHIP =====
-function pick(el,grp,e){
-  const wasOn=el.classList.contains('on');
-  document.querySelectorAll('#'+grp+' .chip').forEach(c=>c.classList.remove('on'));
-  el.classList.add('on');
-  if(e){const r=el.getBoundingClientRect();const x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;const y=(e.touches?e.touches[0].clientY:e.clientY)-r.top;const sz=Math.max(r.width,r.height);const rpl=document.createElement('span');rpl.className='rpl';rpl.style.cssText=`width:${sz}px;height:${sz}px;left:${x-sz/2}px;top:${y-sz/2}px`;el.appendChild(rpl);setTimeout(()=>rpl.remove(),400);}
-  el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');setTimeout(()=>el.classList.remove('pop'),200);
-  playPop(!wasOn);vib(!wasOn);
-}
-function gv(grp){const o=document.querySelector('#'+grp+' .chip.on');return o?o.textContent.replace(/^[🐢🚶🔥]\s*/u,'').trim():'';}
-function sc(grp,val){document.querySelectorAll('#'+grp+' .chip').forEach(c=>{const clean=c.textContent.replace(/^[🐢🚶🔥]\s*/u,'').trim();c.classList.toggle('on',clean===val||c.textContent.trim()===val);});}
-
-// ===== TIME =====
-function d2s(s){if(!s)return 0;const m=String(s).trim().match(/^(\d+):(\d{1,2})$/);if(m)return parseInt(m[1])*60+parseInt(m[2]);const n=parseFloat(s);return isNaN(n)?0:Math.round(n*60);}
-function s2t(s){s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;}
-function total(){return items.reduce((a,it)=>a+d2s(it.dur),0);}
-
-// ===== PAGE NAVIGATION =====
-function toggleEditMode(){
-  editMode=!editMode;
-  applyEditMode();
-}
-
-function applyEditMode(){
-  const btn=document.getElementById('edit-mode-btn');
-  const banner=document.getElementById('edit-lock-banner');
-  const triggers=document.getElementById('add-triggers');
-  const addForm=document.getElementById('add-form');
-  const modeBanner=document.getElementById('mode-banner');
-  const modeLabel=document.getElementById('mode-banner-label');
-  const modeBtn=document.getElementById('mode-banner-btn');
-
-  // ナビの編集ボタン
-  if(btn){
-    btn.textContent=editMode?'🔒 閲覧モードへ':'✏️ 編集モードへ';
-    btn.className='edit-mode-btn'+(editMode?' on':'');
-  }
-
-  // ロックバナー（セトリ上部）
-  if(banner) banner.style.display=editMode?'none':'flex';
-
-  // 曲追加エリア
-  if(triggers) triggers.style.display=editMode?'flex':'none';
-  if(addForm&&!editMode) closeForm();
-
-  // 下部モードバナー
-  if(modeBanner){
-    modeBanner.classList.toggle('show', true);
-    modeBanner.classList.toggle('edit-mode', editMode);
-    modeBanner.classList.toggle('view-mode', !editMode);
-  }
-  if(modeLabel) modeLabel.textContent=editMode?'✏️ 編集モード中':'🔒 閲覧モード';
-  if(modeBtn)   modeBtn.textContent=editMode?'🔒 閲覧モードに戻る':'✏️ 編集する';
-
-  // sl-itemのロック
-  document.querySelectorAll('.sl-item').forEach(el=>{
-    el.classList.toggle('locked',!editMode);
-    el.setAttribute('draggable', editMode?'true':'false');
-  });
-
-  // act-btnの有効/無効
-  document.querySelectorAll('.act-btn').forEach(el=>{
-    el.style.pointerEvents=editMode?'':'none';
-    el.style.opacity=editMode?'':'0.25';
-  });
-}
-
-function goTop(){
-  document.getElementById('page-top').classList.add('active');
-  document.getElementById('page-setlist').classList.remove('active');
-  document.getElementById('nav-back').style.display='none';
-  document.getElementById('edit-mode-btn').style.display='none';
-  editMode=false;
-  document.getElementById('save-label').textContent='';
-  const mb=document.getElementById('mode-banner');
-  if(mb)mb.classList.remove('show');
-  renderTop();
-  window.scrollTo(0,0);
-}
-
-function goSetlist(id){
-  curId=id;
-  const band=bands.find(b=>b.id===id);
-  if(!band)return;
-  items=JSON.parse(JSON.stringify(band.items||[]));
-  seq=Math.max(...items.map(i=>i.id||0),0)+1;
-  document.getElementById('limit').value=band.limit||30;
-  document.getElementById('hero-band-name').textContent=band.name;
-  document.getElementById('hero-band-sub').textContent='江刺甚句まつり　2026.5.3　持ち時間：'+(band.limit||30)+'分';
-  document.getElementById('page-top').classList.remove('active');
-  document.getElementById('page-setlist').classList.add('active');
-  document.getElementById('nav-back').style.display='block';
-  document.getElementById('edit-mode-btn').style.display='flex';
-  editMode=false;
-  document.getElementById('save-dot').classList.add('saved');
-  // モードバナーを表示
-  setTimeout(applyEditMode,50);
-  document.getElementById('save-label').textContent='保存済み ✓';
-  document.getElementById('send-result').style.display='none';
-  const isSent=!!band.sentAt;
-  document.getElementById('send-lbl').textContent=isSent?'再送信する':'送信する（必須）';
-  const box=document.getElementById('send-box');
-  if(box) box.style.borderColor=isSent?'var(--success)':'var(--border)';
-  const st=document.getElementById('send-status');
-  if(st){
-    if(isSent){
-      const d=new Date(band.sentAt);
-      st.textContent='✅ '+d.getHours()+'時'+String(d.getMinutes()).padStart(2,'0')+'分 に送信済み';
-      st.style.color='var(--success)';
-    } else {
-      st.textContent='まだ送信されていません';
-      st.style.color='var(--muted)';
+    if(sel){ctx.save();ctx.shadowColor='#ff6b1a';ctx.shadowBlur=8;}
+    ctx.fillStyle=d.col+'cc';ctx.strokeStyle=sel?'#ff6b1a':'rgba(255,255,255,.15)';ctx.lineWidth=sel?2:.8;
+    ctx.beginPath();ctx.roundRect(x-d.w/2,y-d.h/2,d.w,d.h,4);ctx.fill();ctx.stroke();
+    if(sel)ctx.restore();
+    ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.fillText(d.lbl,x,y-1);
+    ctx.font='8px sans-serif';ctx.fillStyle='rgba(255,255,255,.75)';ctx.fillText(d.sub.slice(0,6),x,y+9);
+    if(it.model){
+      const mw=Math.min(ctx.measureText(it.model).width+8,78);
+      ctx.fillStyle='rgba(0,0,0,.6)';ctx.beginPath();ctx.roundRect(x-mw/2,y+d.h/2+2,mw,12,2);ctx.fill();
+      ctx.fillStyle='#ff9d5c';ctx.font='8px sans-serif';ctx.textAlign='center';
+      ctx.fillText(it.model.length>14?it.model.slice(0,13)+'…':it.model,x,y+d.h/2+11);
     }
   }
-  render();
-  window.scrollTo(0,0);
+  if(fading)ctx.restore();
 }
 
-// ===== TOP RENDER =====
-function renderTop(){
-  const el=document.getElementById('band-select-list');
-  el.innerHTML=bands.map(b=>{
-    const songCount=b.items?.filter(i=>i.type==='song').length||0;
-    const tot=b.items?.reduce((a,it)=>a+d2s(it.dur),0)||0;
-    let badge,badgeClass;
-    if(b.sentAt){badge='✅ 送信済み';badgeClass='badge-sent';}
-    else if(songCount===0){badge='未入力';badgeClass='badge-empty';}
-    else if(songCount<3){badge='入力中';badgeClass='badge-partial';}
-    else{badge='入力済み';badgeClass='badge-done';}
-    return`<div class="band-card${songCount>0?' has-data':''}" onclick="goSetlist('${b.id}')">
-      <div class="band-card-left">
-        <div class="band-card-name">${b.name}</div>
-        <div class="band-card-meta">${songCount>0?songCount+'曲　'+s2t(tot):'まだ曲がありません'}</div>
-      </div>
-      <div class="band-card-status">
-        <span class="status-badge ${badgeClass}">${badge}</span>
-        <span class="chevron">›</span>
-      </div>
-    </div>`;
-  }).join('');
-}
+function isOut(it){return it.y<sY-8||it.y>sY+sH+8||it.x<-8||it.x>W+8;}
 
-// ===== ADD BAND =====
-function showAddBandPopup(){document.getElementById('pov-add-band').classList.add('open');setTimeout(()=>document.getElementById('new-band-name').focus(),100);}
-function closeAddBand(){document.getElementById('pov-add-band').classList.remove('open');}
-function addBand(){
-  const name=document.getElementById('new-band-name').value.trim();
-  const limit=parseInt(document.getElementById('new-band-limit').value)||30;
-  if(!name){document.getElementById('new-band-name').focus();return;}
-  bands.push({id:'b'+Date.now(),name,limit,sentAt:null,updatedAt:new Date().toISOString(),items:[]});
-  saveBands();closeAddBand();renderTop();
-  document.getElementById('new-band-name').value='';
-  showToast(name+' を追加しました');
-}
-document.getElementById('pov-add-band').addEventListener('click',e=>{if(e.target.id==='pov-add-band')closeAddBand();});
-
-// ===== AUTO SAVE =====
-function autoSave(){
-  document.getElementById('save-dot').classList.remove('saved');
-  document.getElementById('save-label').textContent='保存中...';
-  clearTimeout(saveTimer);
-  saveTimer=setTimeout(()=>{
-    const b=bands.find(x=>x.id===curId);
-    if(b){b.items=JSON.parse(JSON.stringify(items));b.limit=parseInt(document.getElementById('limit').value)||30;b.updatedAt=new Date().toISOString();}
-    saveBands();
-    document.getElementById('save-dot').classList.add('saved');
-    document.getElementById('save-label').textContent='保存済み ✓';
-  },800);
-}
-
-// ===== FORM =====
-function openForm(mode){
-  formMode=mode;
-  const form=document.getElementById('add-form'),trig=document.getElementById('trig-'+mode);
-  if(form.classList.contains('open')&&trig.classList.contains('active')){closeForm();return;}
-  document.querySelectorAll('.trig-btn').forEach(b=>b.classList.remove('active'));
-  trig.classList.add('active');
-  const isSong=mode==='song',isMC=mode==='mc';
-  document.getElementById('form-title').textContent=isSong?'🎵 曲を追加':isMC?'🎤 MCを追加':'🔄 SE/転換を追加';
-  document.getElementById('f-tempo').style.display=isSong?'':'none';
-  document.getElementById('f-light').style.display=isSong?'':'none';
-  document.getElementById('f-pa').style.display=isSong?'':'none';
-  document.getElementById('f-note').style.display=isMC?'':'none';
-  document.getElementById('a-note').value='';
-  document.getElementById('a-dur').value=isSong?'':(isMC?'2:00':'0:30');
-  document.getElementById('a-name').value='';
-  sc('a-tempo','普通');sc('a-light','おまかせ');sc('a-pa','おまかせ');
-  form.classList.add('open');
-  setTimeout(()=>document.getElementById('a-name').focus(),100);
-}
-function closeForm(){document.getElementById('add-form').classList.remove('open');document.querySelectorAll('.trig-btn').forEach(b=>b.classList.remove('active'));formMode=null;}
-function doAdd(){
-  const name=document.getElementById('a-name').value.trim(),dur=document.getElementById('a-dur').value.trim();
-  if(formMode==='song'&&!name){document.getElementById('a-name').focus();return;}
-  items.push({id:seq++,type:formMode,name:name||(formMode==='mc'?'MC':'転換'),dur,tempo:gv('a-tempo'),light:gv('a-light'),pa:gv('a-pa'),note:document.getElementById('a-note').value.trim()});
-  closeForm();render();autoSave();showToast('追加しました ✓');
-}
-
-// ===== RENDER =====
-function render(){
-  const lim=(parseInt(document.getElementById('limit').value)||30)*60;
-  const tot=total(),songs=items.filter(i=>i.type==='song').length,left=lim-tot;
-  document.getElementById('s-total').textContent=s2t(tot);
-  document.getElementById('s-songs').textContent=songs+'曲';
-  const le=document.getElementById('s-left');
-  le.textContent=(left>=0?'残り ':'超過 ')+s2t(Math.abs(left));
-  le.className='sum-val'+(left<0?' warn':' ok');
-  const bar=document.getElementById('tl-bar');
-  bar.innerHTML=tot>0?items.map(it=>{const w=Math.max(2,(d2s(it.dur)/tot)*100);return`<div class="tl-seg ${it.type!=='song'?'tl-mc':'tl-song'}" style="flex:${w};height:100%;border-radius:2px"></div>`;}).join(''):'';
-  let sn=0;
-  const listEl=document.getElementById('sl-list');
-  if(!items.length){listEl.innerHTML='<div class="sl-empty">まだ曲がありません<br>下の「曲を追加」から追加してください</div>';}
-  else{
-    listEl.innerHTML=items.map((it,idx)=>{
-      const isMC=it.type!=='song';if(it.type==='song')sn++;
-      const ndisp=it.type==='song'?sn:it.type==='mc'?'MC':'SE';
-      const dur=it.dur?s2t(d2s(it.dur)):'―';
-      const tags=[];
-      if(it.tempo==='遅い')tags.push(`<span class="tag tag-slow">🐢 遅い</span>`);
-      if(it.tempo==='速い')tags.push(`<span class="tag tag-fast">🔥 速い</span>`);
-      if(it.light&&it.light!=='おまかせ')tags.push(`<span class="tag tag-light">💡 ${it.light}</span>`);
-      if(it.pa&&it.pa!=='おまかせ')tags.push(`<span class="tag tag-pa">🎚 ${it.pa}</span>`);
-      if(it.note)tags.push(`<span class="tag">📝 ${it.note}</span>`);
-      return`<div class="sl-item${isMC?' mc-item':''}" id="si-${it.id}" draggable="true" ondragstart="ds(event,${idx})" ondragover="dov(event,${idx})" ondrop="dp(event,${idx})" ondragend="de()" ontouchstart="ts(event,${idx})" ontouchmove="tm(event)" ontouchend="te(event,${idx})">
-        <span class="drag-handle">⠿</span><span class="item-num">${ndisp}</span>
-        <div class="item-body"><div class="item-name${isMC?' mc-name':''}">${it.name}</div>
-        <div class="item-meta"><span class="item-dur">${dur}</span>${tags.join('')}</div></div>
-        <div class="item-actions">
-          <button class="act-btn" onclick="openP(${it.id})">編集</button>
-          <button class="act-btn del" onclick="delById(${it.id})">✕</button>
-        </div>
-      </div>`;
-    }).join('');
+function hit(x,y){
+  const items=allItems[cBid];
+  for(let i=items.length-1;i>=0;i--){
+    const it=items[i],d=D[it.type];if(!d)continue;
+    const ix=it.x??it.xp*W,iy=it.y??it.yp*W;
+    if(Math.abs(x-ix)<=d.w/2+5&&Math.abs(y-iy)<=d.h/2+5)return it;
   }
-  document.getElementById('send-btn').disabled=items.length===0;
-  renderOut();
-  // ロック状態を再適用
-  setTimeout(applyEditMode, 0);
+  return null;
 }
 
-// ===== SEND =====
-async function sendToSheets(){
-  const band=bands.find(b=>b.id===curId);if(!band||!items.length)return;
-  const btn=document.getElementById('send-btn'),lbl=document.getElementById('send-lbl'),res=document.getElementById('send-result');
-  btn.disabled=true;lbl.textContent='送信中...';res.style.display='none';
-  const payload={bandName:band.name,eventName:'江刺甚句まつり',eventDate:'2026-05-03',eventVenue:'江刺大通公園',
-    items:items.map((it,i)=>({order:i+1,type:it.type,name:it.name,dur:it.dur||'',tempo:it.tempo||'',light:it.light||'',pa:it.pa||'',note:it.note||''}))};
-  try{
-    await fetch(GAS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    res.className='send-result send-ok';
-    res.textContent='✅ 送信完了！PAスタッフ・主催者に届きました。';
-    res.style.display='block';
-    lbl.textContent='再送信する';
-    const now=new Date();
-    const timeStr=now.getHours()+'時'+String(now.getMinutes()).padStart(2,'0')+'分';
-    const st=document.getElementById('send-status');
-    if(st){st.textContent='✅ '+timeStr+' に送信済み';st.style.color='var(--success)';}
-    // 送信ボックスの枠をグリーンに
-    const box=document.getElementById('send-box');
-    if(box){box.style.borderColor='var(--success)';}
-    band.sentAt=now.toISOString();saveBands();
-    playPop(true);vib(true);
-  }catch(e){
-    res.className='send-result send-err';
-    res.textContent='❌ 送信に失敗しました。通信環境を確認して再度お試しください。';
-    res.style.display='block';
-    lbl.textContent='再送信する';
-    const st2=document.getElementById('send-status');
-    if(st2){st2.textContent='⚠️ 送信失敗 — 再送信してください';st2.style.color='var(--danger)';}
-  }
-  btn.disabled=false;
+function gxy(e){const r=cv.getBoundingClientRect(),s=e.touches?e.touches[0]:e;return{x:s.clientX-r.left,y:s.clientY-r.top};}
+function onD(e){e.preventDefault();const p=gxy(e);const h=hit(p.x,p.y);moved=false;drag=null;if(h){drag=h;doff.x=p.x-h.x;doff.y=p.y-h.y;h.x=h.x??h.xp*W;h.y=h.y??h.yp*W;}}
+function onM(e){e.preventDefault();if(!drag)return;const p=gxy(e);drag.x=p.x-doff.x;drag.y=p.y-doff.y;moved=true;draw();}
+function onU(e){e.preventDefault();if(drag){if(isOut(drag))allItems[cBid]=allItems[cBid].filter(i=>i.id!==drag.id);const was=drag;drag=null;draw();if(!moved)openP(was);}moved=false;}
+cv.addEventListener('touchstart',onD,{passive:false});
+cv.addEventListener('touchmove',onM,{passive:false});
+cv.addEventListener('touchend',onU,{passive:false});
+cv.addEventListener('mousedown',onD);
+cv.addEventListener('mousemove',e=>{if(drag)onM(e);});
+cv.addEventListener('mouseup',onU);
+cv.addEventListener('mouseleave',e=>{if(drag){drag=null;draw();}});
+
+function tc(el,id){document.querySelectorAll('#'+id+' .chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');}
+function cv2(id){const o=document.querySelector('#'+id+' .chip.on');return o?o.textContent:'';}
+function sc(id,v){document.querySelectorAll('#'+id+' .chip').forEach(c=>c.classList.toggle('on',c.textContent===v));}
+
+function openP(it){
+  editId=it.id;const d=D[it.type];
+  document.getElementById('pttl').textContent=(EMJ[it.type]||'🎵')+' '+d.sub+' を編集';
+  document.getElementById('pm').value=it.model||'';
+  document.getElementById('pn').value=it.note||'';
+  sc('co',it.own||'会場借り');
+  const isDr=it.type==='drum',isGt=it.type==='gt'||it.type==='ba_p',isVo=it.type==='vo'||it.type==='cho',isMon=it.type==='mon';
+  document.getElementById('drum-s').style.display=isDr?'':'none';
+  document.getElementById('gt-s').style.display=isGt?'':'none';
+  document.getElementById('vo-s').style.display=isVo?'':'none';
+  document.getElementById('mon-s').style.display=isMon?'':'none';
+  if(isDr){sc('ctom',it.tom||'2タム');sc('cped',it.ped||'1バス');sc('ccym',it.cym||'会場のまま');sc('cmtr',it.mtr||'なし');}
+  if(isGt){sc('camp',it.amp||'上手 Amp');sc('cstd',it.std||'センター');sc('ccho',it.cho||'コーラスなし');}
+  if(isVo)sc('cmic',it.mic||'SM58系');
+  if(isMon)sc('cmon',it.mon||'PAに任せる');
+  document.getElementById('pov').classList.add('open');draw();
 }
-
-// ===== OUTPUT =====
-function togglePaSheet(){
-  const body=document.getElementById('pa-sheet-body');
-  const chev=document.getElementById('pa-chevron');
-  const open=!body.classList.contains('open');
-  body.classList.toggle('open',open);
-  chev.style.transform=open?'rotate(90deg)':'';
-  if(open)renderOut();
+function closeP(){document.getElementById('pov').classList.remove('open');editId=null;draw();}
+function saveItem(){
+  const it=allItems[cBid].find(i=>i.id===editId);if(!it)return;
+  it.model=document.getElementById('pm').value;it.note=document.getElementById('pn').value;it.own=cv2('co');
+  if(it.type==='drum'){it.tom=cv2('ctom');it.ped=cv2('cped');it.cym=cv2('ccym');it.mtr=cv2('cmtr');}
+  if(it.type==='gt'||it.type==='ba_p'){it.amp=cv2('camp');it.std=cv2('cstd');it.cho=cv2('ccho');}
+  if(it.type==='vo'||it.type==='cho')it.mic=cv2('cmic');
+  if(it.type==='mon')it.mon=cv2('cmon');
+  closeP();showToast('保存しました ✓');
 }
+function delItem(){allItems[cBid]=allItems[cBid].filter(i=>i.id!==editId);closeP();}
+document.getElementById('pov').addEventListener('click',e=>{if(e.target.id==='pov')closeP();});
 
-function renderOut(){
-  const band=bands.find(b=>b.id===curId);
-  const lim=parseInt(document.getElementById('limit').value)||30;
-  const tot=total();
-  const rowsEl=document.getElementById('pa-sheet-rows');
-  const sumEl=document.getElementById('pa-sheet-summary');
-  if(!rowsEl)return;
-
-  let sn=0, html='';
+function expTxt(){
+  const items=allItems[cBid];if(!items.length){showToast('機材が配置されていません');return;}
+  const b=BANDS[cBid];let t='【ステージセッティング】'+b.name+'\n江刺甚句まつり 2026年5月3日\n'+'─'.repeat(28)+'\n';
   items.forEach(it=>{
-    const dur=d2s(it.dur);
-    const durStr=it.dur?s2t(dur):'';
-    if(it.type==='song'){
-      sn++;
-      const tags=[];
-      if(durStr) tags.push(`<span class="pa-tag pa-dur">⏱ ${durStr}</span>`);
-      if(it.tempo==='遅い') tags.push(`<span class="pa-tag pa-tempo-slow">🐢 遅い</span>`);
-      if(it.tempo==='速い') tags.push(`<span class="pa-tag pa-tempo-fast">🔥 速い</span>`);
-      if(it.light&&it.light!=='おまかせ') tags.push(`<span class="pa-tag pa-light">💡 ${it.light}</span>`);
-      if(it.pa&&it.pa!=='おまかせ') tags.push(`<span class="pa-tag pa-pa">🎚 ${it.pa}</span>`);
-      if(it.note) tags.push(`<span class="pa-tag pa-note">📝 ${it.note}</span>`);
-      html+=`<div class="pa-song-row">
-        <div class="pa-num">${sn}</div>
-        <div class="pa-content">
-          <div class="pa-song-name">${it.name}</div>
-          ${tags.length?`<div class="pa-tags">${tags.join('')}</div>`:''}
-        </div>
-      </div>`;
-    } else if(it.type==='mc'){
-      html+=`<div class="pa-song-row mc-row">
-        <div class="pa-num mc-num">MC</div>
-        <div class="pa-content">
-          <div class="pa-mc-name">🎤 ${it.name!=='MC'?it.name:'MC'}${durStr?' ('+durStr+')':''}</div>
-        </div>
-      </div>`;
-    } else {
-      html+=`<div class="pa-song-row mc-row">
-        <div class="pa-num mc-num">SE</div>
-        <div class="pa-content">
-          <div class="pa-mc-name">🔄 ${it.name!=='転換'?it.name:'転換'}${durStr?' ('+durStr+')':''}</div>
-        </div>
-      </div>`;
-    }
+    const d=D[it.type],x=it.x??it.xp*W;
+    const side=x<W*.38?'下手':x>W*.62?'上手':'センター';
+    t+='・'+d.sub;if(it.model)t+=' ［'+it.model+'］';t+=' → '+side;
+    if(it.own&&it.own!=='会場借り')t+=' / '+it.own;
+    if(it.type==='drum'){if(it.tom)t+=' / '+it.tom;if(it.mtr&&it.mtr!=='なし')t+=' / '+it.mtr;}
+    if(it.type==='gt'||it.type==='ba_p'){if(it.amp)t+=' / '+it.amp;if(it.cho==='コーラスあり')t+=' / Cho';}
+    if(it.note)t+=' ※'+it.note;t+='\n';
   });
-  rowsEl.innerHTML=html||'<div style="padding:16px;text-align:center;font-size:12px;color:var(--muted)">曲がありません</div>';
-  if(sumEl){
-    const songs=items.filter(i=>i.type==='song').length;
-    sumEl.innerHTML=`<span>🎵 ${songs}曲</span><span>⏱ 総時間 ${s2t(tot)}</span><span>📋 持ち時間 ${lim}分</span><span>${band?.name||''}</span>`;
-  }
-}
-
-function copyOut(){
-  const band=bands.find(b=>b.id===curId);
-  const lim=parseInt(document.getElementById('limit').value)||30;
-  const lines=['【江刺甚句まつり】2026年5月3日　江刺大通公園',`【セットリスト】${band?.name||''}`,`持ち時間：${lim}分　総時間：${s2t(total())}`,'─'.repeat(30)];
-  let sn=0;
-  items.forEach(it=>{
-    const dur=d2s(it.dur);
-    if(it.type==='song'){sn++;const te=it.tempo==='遅い'?'🐢':it.tempo==='速い'?'🔥':'';let l=`${String(sn).padStart(2,' ')}. ${it.name}`;if(it.dur)l+=`　${s2t(dur)}`;if(te)l+=`　${te}`;lines.push(l);if(it.light&&it.light!=='おまかせ')lines.push(`　　💡 ${it.light}`);if(it.pa&&it.pa!=='おまかせ')lines.push(`　　🎚 ${it.pa}`);if(it.note)lines.push(`　　📝 ${it.note}`);}
-    else if(it.type==='mc')lines.push(`  ── MC ${it.dur?s2t(dur):''}　${it.name!=='MC'?it.name:''}`);
-    else lines.push(`  ── 転換 ${it.dur?s2t(dur):''}　${it.name!=='転換'?it.name:''}`);
-  });
-  lines.push('─'.repeat(30));lines.push(`合計 ${s2t(total())} / ${lim}:00`);
-  const t=lines.join('\n');
   navigator.clipboard?.writeText(t).then(()=>showToast('コピーしました！')).catch(()=>alert(t));
 }
 
-// ===== POPUP =====
-function openP(id){
-  editId=id;const it=items.find(i=>i.id===id);if(!it)return;
-  document.getElementById('pop-ttl').textContent=it.type==='song'?'曲を編集':it.type==='mc'?'MCを編集':'SE/転換を編集';
-  document.getElementById('pe-name').value=it.name;document.getElementById('pe-dur').value=it.dur||'';document.getElementById('pe-note').value=it.note||'';
-  sc('pe-tempo',it.tempo||'普通');sc('pe-light',it.light||'おまかせ');sc('pe-pa',it.pa||'おまかせ');
-  document.getElementById('pe-song-opts').style.display=it.type==='song'?'':'none';
-  document.getElementById('pov').classList.add('open');
-}
-function closeP(){document.getElementById('pov').classList.remove('open');editId=null;}
-function saveItem(){const it=items.find(i=>i.id===editId);if(!it)return;it.name=document.getElementById('pe-name').value||it.name;it.dur=document.getElementById('pe-dur').value;it.note=document.getElementById('pe-note').value;it.tempo=gv('pe-tempo');if(it.type==='song'){it.light=gv('pe-light');it.pa=gv('pe-pa');}closeP();render();autoSave();showToast('保存しました ✓');}
-function delItem(){items=items.filter(i=>i.id!==editId);closeP();render();autoSave();}
-function delById(id){items=items.filter(i=>i.id!==id);render();autoSave();}
-document.getElementById('pov').addEventListener('click',e=>{if(e.target.id==='pov')closeP();});
+function showToast(msg){const e=document.getElementById('toast');e.textContent=msg;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2200);}
 
-// ===== DRAG (長押し1秒 + ゴースト影 + 挿入アニメーション) =====
-let longPressTimer=null, longPressActive=false, insertIdx=null;
-let touchStartX=0, touchStartY=0, touchMoved=false;
-
-// ---- ゴースト表示 ----
-function showGhost(idx, cx, cy){
-  const it=items[idx]; if(!it)return;
-  let sn=0; for(let k=0;k<=idx;k++) if(items[k].type==='song') sn++;
-  document.getElementById('ghost-num').textContent=it.type==='song'?sn+'.':'MC';
-  document.getElementById('ghost-name').textContent=it.name;
-  const g=document.getElementById('drag-ghost');
-  g.style.display='block'; g.style.opacity='';
-  moveGhost(cx,cy);
-}
-function moveGhost(cx,cy){
-  const g=document.getElementById('drag-ghost');
-  const gw=Math.max(g.offsetWidth,160);
-  const gh=g.offsetHeight||56;
-  g.style.left=Math.max(4,Math.min(window.innerWidth-gw-4,cx-gw/2))+'px';
-  g.style.top=Math.max(4,cy-gh-20)+'px';
-}
-function hideGhost(){
-  const g=document.getElementById('drag-ghost');
-  g.style.opacity='0';
-  setTimeout(()=>{g.style.display='none';g.style.opacity='';},150);
-}
-
-// ---- マウス用（PC）----
-function ds(e,i){if(!editMode)return;dragSrc=i;e.currentTarget.classList.add('dragging-src');}
-function dov(e,i){
-  e.preventDefault();
-  if(dragSrc===null||i===dragSrc)return;
-  const el=document.getElementById('si-'+items[i]?.id);
-  const r=el.getBoundingClientRect();
-  document.querySelectorAll('.sl-item').forEach(x=>x.classList.remove('insert-above','insert-below'));
-  if(e.clientY<r.top+r.height/2){el.classList.add('insert-above');insertIdx=i;}
-  else{el.classList.add('insert-below');insertIdx=i+1;}
-  dragOver=i;
-}
-function dp(e,i){
-  e.preventDefault();
-  document.querySelectorAll('.sl-item').forEach(x=>x.classList.remove('insert-above','insert-below','dragging-src'));
-  if(dragSrc!==null&&insertIdx!==null&&insertIdx!==dragSrc&&insertIdx!==dragSrc+1){
-    const moved=items.splice(dragSrc,1)[0];
-    const ri=insertIdx>dragSrc?insertIdx-1:insertIdx;
-    items.splice(ri,0,moved); render(); autoSave();
-    setTimeout(()=>{const el=document.getElementById('si-'+moved.id);if(el)el.classList.add('just-inserted');},10);
-    showToast('✓ 順番を変更しました');
-  }
-  dragSrc=null;dragOver=null;insertIdx=null;
-}
-function de(){
-  document.querySelectorAll('.sl-item').forEach(x=>x.classList.remove('insert-above','insert-below','dragging-src'));
-  dragSrc=null;insertIdx=null;
-}
-
-// ---- タッチ用（スマホ）----
-function ts(e,i){
-  // 閲覧モードまたはact-btn → 完全スルー（スクロール自由）
-  if(!editMode||e.target.classList.contains('act-btn'))return;
-  longPressActive=false;touchSrc=null;dragOver=null;insertIdx=null;touchMoved=false;
-  touchStartX=e.touches[0].clientX;
-  touchStartY=e.touches[0].clientY;
-  longPressTimer=setTimeout(()=>{
-    if(touchMoved)return;
-    longPressActive=true; touchSrc=i;
-    const el=document.getElementById('si-'+items[i]?.id);
-    if(el)el.classList.add('long-press-active','dragging-src');
-    showGhost(i, touchStartX, touchStartY);
-    try{navigator.vibrate&&navigator.vibrate([40,30,40]);}catch(e2){}
-    showToast('そのままスライドして移動');
-  },1000);
-}
-
-function tm(e){
-  const cx=e.touches[0].clientX;
-  const cy=e.touches[0].clientY;
-
-  if(!longPressActive){
-    // 長押し前：6px以上動いたらキャンセル → スクロール通す
-    if(Math.abs(cx-touchStartX)>6||Math.abs(cy-touchStartY)>6){
-      touchMoved=true;
-      clearTimeout(longPressTimer);
-    }
-    return; // preventDefault しない → スクロール自由
-  }
-
-  // 長押し確定後のドラッグ処理
-  e.preventDefault();
-  moveGhost(cx, cy);
-
-  document.querySelectorAll('.sl-item').forEach((el,idx)=>{
-    el.classList.remove('insert-above','insert-below');
-    if(idx===touchSrc)return;
-    const r=el.getBoundingClientRect();
-    if(cy>=r.top-6&&cy<=r.bottom+6){
-      if(cy<r.top+r.height/2){el.classList.add('insert-above');insertIdx=idx;}
-      else{el.classList.add('insert-below');insertIdx=idx+1;}
-      dragOver=idx;
-    }
-  });
-}
-
-function te(e,i){
-  clearTimeout(longPressTimer);
-  hideGhost();
-  document.querySelectorAll('.sl-item').forEach(el=>
-    el.classList.remove('insert-above','insert-below','long-press-active','dragging-src')
-  );
-  if(longPressActive&&touchSrc!==null&&insertIdx!==null&&insertIdx!==touchSrc&&insertIdx!==touchSrc+1){
-    const moved=items.splice(touchSrc,1)[0];
-    const ri=insertIdx>touchSrc?insertIdx-1:insertIdx;
-    items.splice(ri,0,moved); render(); autoSave();
-    setTimeout(()=>{const el=document.getElementById('si-'+moved.id);if(el)el.classList.add('just-inserted');},10);
-    showToast('✓ 順番を変更しました');
-  }
-  touchSrc=null;dragOver=null;insertIdx=null;longPressActive=false;touchMoved=false;
-}
-
-// ===== TOAST =====
-function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);}
-document.addEventListener('keydown',e=>{if(e.key==='Enter'&&formMode&&document.activeElement.closest('.add-form'))doAdd();});
-
-// ===== INIT =====
-// ===== SCHEDULE DATA =====
-const SCHEDULE = [
-  {time:'08:00', label:'スタッフ入り', sub:'セッティング開始', type:'staff', emoji:'👤'},
-  {time:'09:00', label:'リハーサル開始', sub:'グッパイグッピー → Bull pain catcher → 鹿ROCK', type:'reh', emoji:'🎸'},
-  {time:'09:00', label:'グッパイグッピー', sub:'リハーサル', type:'reh-band', emoji:'🎸', bandId:'gg'},
-  {time:'09:20', label:'Bull pain catcher', sub:'リハーサル', type:'reh-band', emoji:'🎸', bandId:'bpc'},
-  {time:'09:40', label:'鹿ROCK', sub:'リハーサル', type:'reh-band', emoji:'🎸', bandId:'shika'},
-  {time:'09:55', label:'場内整備・準備', sub:'開場前チェック', type:'staff', emoji:'🔧'},
-  {time:'10:00', label:'グッパイグッピー', sub:'BAND LIVE STAGE', type:'live', emoji:'🎵', bandId:'gg'},
-  {time:'10:50', label:'Bull pain catcher', sub:'BAND LIVE STAGE', type:'live', emoji:'🎵', bandId:'bpc'},
-  {time:'11:40', label:'鹿ROCK', sub:'BAND LIVE STAGE', type:'live', emoji:'🎵', bandId:'shika'},
-  {time:'12:30', label:'終演', sub:'お疲れ様でした！', type:'end', emoji:'🏁'},
-];
-
-function timeToMin(t){const[h,m]=t.split(':').map(Number);return h*60+m;}
-
-function getNowMin(){
-  const now=new Date();
-  // 本番は実時間。テスト用に日付が違う場合も今日の時間を使う
-  return now.getHours()*60+now.getMinutes()+now.getSeconds()/60;
-}
-
-function toggleTimeline(){
-  const rows=document.getElementById('timeline-rows');
-  const chev=document.getElementById('tl-chevron');
-  const open=rows.style.display==='none';
-  rows.style.display=open?'block':'none';
-  chev.style.transform=open?'rotate(90deg)':'';
-  if(open)renderTimeline();
-}
-
-function renderTimeline(){
-  const nowMin=getNowMin();
-  const rows=document.getElementById('timeline-rows');
-  if(!rows)return;
-
-  rows.innerHTML=SCHEDULE.map((s,i)=>{
-    const sMin=timeToMin(s.time);
-    const nextMin=i+1<SCHEDULE.length?timeToMin(SCHEDULE[i+1].time):sMin+60;
-    const isDone=nowMin>nextMin;
-    const isNow=nowMin>=sMin&&nowMin<nextMin;
-    const isFuture=nowMin<sMin;
-
-    let dotClass=s.type==='staff'||s.type==='end'?'staff':s.type==='reh'||s.type==='reh-band'?'reh':'live';
-    if(isDone)dotClass='done';
-    if(isNow)dotClass='now';
-
-    const nowBadge=isNow?'<span class="now-badge">NOW</span>':'';
-    const nameClass=isDone?'tl-band-name dim':'tl-band-name';
-    const checkMark=isDone?'✓ ':'';
-
-    let progressBar='';
-    if(isNow&&s.type==='live'){
-      const elapsed=nowMin-sMin;
-      const total=nextMin-sMin;
-      const pct=Math.min(100,Math.round(elapsed/total*100));
-      progressBar=`<div class="tl-bar-wrap"><div class="tl-bar-fill" id="bar-${i}" style="width:${pct}%"></div></div>`;
-    }
-
-    return`<div class="tl-row">
-      <div class="tl-dot ${dotClass}">${isDone?'✓':s.emoji}</div>
-      <div class="tl-body">
-        <div class="tl-time-label">${s.time}〜</div>
-        <div class="${nameClass}">${checkMark}${s.label}${nowBadge}</div>
-        <div class="tl-band-sub">${s.sub}</div>
-        ${progressBar}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function updateNextBand(){
-  const nowMin=getNowMin();
-  // 次の live イベントを探す
-  const next=SCHEDULE.find(s=>s.type==='live'&&timeToMin(s.time)>nowMin);
-  const current=SCHEDULE.find((s,i)=>{
-    const sMin=timeToMin(s.time);
-    const nextMin=i+1<SCHEDULE.length?timeToMin(SCHEDULE[i+1].time):sMin+60;
-    return s.type==='live'&&nowMin>=sMin&&nowMin<nextMin;
-  });
-
-  const nb=document.getElementById('next-band');
-  const nt=document.getElementById('next-time');
-  const nl=document.getElementById('next-label');
-  if(!nb)return;
-
-  if(current){
-    nl.textContent='🎵 演奏中';
-    nb.textContent=current.label;
-    const sMin=timeToMin(current.time);
-    const endMin=sMin+50;
-    const rem=endMin-nowMin;
-    nt.textContent='残り約'+Math.max(0,Math.round(rem))+'分';
-  } else if(next){
-    nl.textContent='次の出番';
-    nb.textContent=next.label;
-    const diff=timeToMin(next.time)-nowMin;
-    nt.textContent=next.time+'〜　あと'+Math.round(diff)+'分';
-  } else {
-    // 公演日との比較
-    const now2=new Date();
-    const eventDate=new Date('2026-05-03');
-    const todayStr=now2.getFullYear()+'-'+String(now2.getMonth()+1).padStart(2,'0')+'-'+String(now2.getDate()).padStart(2,'0');
-    const eventStr='2026-05-03';
-    const diffMs=eventDate-new Date(todayStr);
-    const diffDays=Math.round(diffMs/(1000*60*60*24));
-    if(diffDays>1){
-      nl.textContent='本番まで';
-      nb.textContent='あと'+diffDays+'日！';
-      nt.textContent='5月3日（日）おまつり広場ステージ';
-      nb.style.color='var(--acc)';
-    } else if(diffDays===1){
-      nl.textContent='🔥 いよいよ明日！';
-      nb.textContent='江刺甚句まつり';
-      nt.textContent='5月3日（日）本番！';
-      nb.style.color='var(--acc)';
-    } else if(diffDays===0&&nowMin>timeToMin('12:30')){
-      nl.textContent='🎉 お疲れ様でした！';
-      nb.textContent='全バンド終演';
-      nt.textContent='最高のステージでした！';
-      nb.style.color='var(--success)';
-    } else {
-      nl.textContent='本日の公演';
-      nb.textContent='終了しました';
-      nt.textContent='お疲れ様でした！';
-      nb.style.color='var(--muted)';
-    }
-  }
-}
-
-function startClock(){
-  function tick(){
-    const now=new Date();
-    const h=String(now.getHours()).padStart(2,'0');
-    const m=String(now.getMinutes()).padStart(2,'0');
-    const s=String(now.getSeconds()).padStart(2,'0');
-    // メイン時計（トップページ）
-    const el=document.getElementById('clock-time');
-    if(el)el.textContent=h+':'+m+':'+s;
-    const days=['日','月','火','水','木','金','土'];
-    const de=document.getElementById('clock-date');
-    if(de)de.textContent=(now.getMonth()+1)+'月'+now.getDate()+'日（'+days[now.getDay()]+'）';
-    // ナビバー時計（常時表示）
-    const nc=document.getElementById('nav-clock');
-    if(nc)nc.textContent=h+':'+m+':'+s;
-    // ナビバー次の出番
-    const nowMin=getNowMin();
-    const current=SCHEDULE.find((s2,i)=>{
-      const sMin=timeToMin(s2.time);
-      const nextMin=i+1<SCHEDULE.length?timeToMin(SCHEDULE[i+1].time):sMin+60;
-      return s2.type==='live'&&nowMin>=sMin&&nowMin<nextMin;
-    });
-    const next=SCHEDULE.find(s2=>s2.type==='live'&&timeToMin(s2.time)>nowMin);
-    const nn=document.getElementById('nav-next');
-    if(nn){
-      if(current){
-        const rem=Math.max(0,Math.round(timeToMin(current.time)+50-nowMin));
-        nn.textContent='🎵 '+current.label.slice(0,6)+'… 残'+rem+'分';
-        nn.style.color='var(--acc)';
-      } else if(next){
-        const diff=Math.round(timeToMin(next.time)-nowMin);
-        nn.textContent='次:'+next.time+' '+next.label.slice(0,5)+'…';
-        nn.style.color='var(--muted)';
-      } else {
-        nn.textContent=''; 
-      }
-    }
-    updateNextBand();
-    if(now.getSeconds()%10===0)renderTimeline();
-  }
-  tick();
-  setInterval(tick,1000);
-}
-
-initBands();
-renderTop();
-renderTimeline();
-startClock();
+window.addEventListener('resize',resize);
+resize();renderMembers();
 </script>
 </body>
 </html>
