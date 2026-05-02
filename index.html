@@ -113,20 +113,65 @@ nav{background:#0a0a0a;border-bottom:1px solid var(--border);padding:11px 16px;p
 @keyframes slideDown{0%{transform:translateY(-100%);opacity:0}100%{transform:translateY(0);opacity:1}}
 @keyframes slideUp{0%{transform:translateY(100%);opacity:0}100%{transform:translateY(0);opacity:1}}
 /* 挿入インジケーター */
-.insert-above{border-top:3px solid var(--acc)!important;margin-top:-3px}
-.insert-below{border-bottom:3px solid var(--acc)!important}
-/* ドラッグ中のアイテム */
-.sl-item.dragging-src{opacity:.25;transform:scale(.96);box-shadow:none!important}
-/* スライド挿入アニメーション */
-@keyframes slideInDown{0%{transform:translateY(-40px);opacity:0}60%{transform:translateY(4px)}100%{transform:translateY(0);opacity:1}}
-@keyframes slideInUp{0%{transform:translateY(40px);opacity:0}60%{transform:translateY(-4px)}100%{transform:translateY(0);opacity:1}}
-@keyframes nudgeDown{0%{transform:translateY(0)}50%{transform:translateY(6px)}100%{transform:translateY(0)}}
-@keyframes nudgeUp{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
-.sl-item.anim-in-down{animation:slideInDown .25s cubic-bezier(.34,1.56,.64,1) forwards}
-.sl-item.anim-in-up{animation:slideInUp .25s cubic-bezier(.34,1.56,.64,1) forwards}
-.sl-item.anim-nudge-down{animation:nudgeDown .2s ease forwards}
-.sl-item.anim-nudge-up{animation:nudgeUp .2s ease forwards}
-.sl-item.just-inserted{animation:slideInDown .25s cubic-bezier(.34,1.56,.64,1) forwards}
+.insert-above::before{
+  content:'▶ ここに挿入';
+  display:block;height:38px;
+  background:#ff6b1a22;
+  border:2px dashed var(--acc);
+  border-radius:8px;
+  color:var(--acc);font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:4px;
+  animation:insertPulse .6s ease infinite alternate;
+}
+.insert-below::after{
+  content:'▶ ここに挿入';
+  display:block;height:38px;
+  background:#ff6b1a22;
+  border:2px dashed var(--acc);
+  border-radius:8px;
+  color:var(--acc);font-size:12px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  margin-top:4px;
+  animation:insertPulse .6s ease infinite alternate;
+}
+@keyframes insertPulse{0%{background:#ff6b1a18;border-color:#ff6b1a88}100%{background:#ff6b1a35;border-color:#ff6b1a}}
+
+/* ドラッグ中のソース */
+.sl-item.dragging-src{
+  opacity:.15;
+  transform:scale(.92);
+  filter:blur(2px);
+  transition:opacity .12s,transform .12s;
+}
+/* つかんでいる状態 */
+.sl-item.grabbing{
+  border:2px solid var(--acc)!important;
+  box-shadow:0 0 0 3px rgba(255,107,26,.35),0 6px 24px rgba(255,107,26,.4);
+  transform:scale(1.04);
+  transition:all .12s cubic-bezier(.34,1.56,.64,1);
+  cursor:grabbing;
+  z-index:10;
+}
+.sl-item.grabbing .item-name{color:var(--acc)!important;text-shadow:0 0 12px rgba(255,107,26,.5)}
+.sl-item.grabbing .item-num{background:var(--acc)!important;color:#000!important}
+
+/* 周囲の曲がリアルタイムでずれる */
+.sl-item.shift-down{transform:translateY(56px) scale(.98);transition:transform .18s cubic-bezier(.4,0,.2,1);z-index:0}
+.sl-item.shift-up{transform:translateY(-56px) scale(.98);transition:transform .18s cubic-bezier(.4,0,.2,1);z-index:0}
+
+/* 着地アニメーション */
+@keyframes landBounce{
+  0%  {transform:scale(1.06) translateY(-8px);box-shadow:0 12px 40px rgba(255,107,26,.6)}
+  40% {transform:scale(.97)  translateY(2px); box-shadow:0 4px 12px rgba(255,107,26,.3)}
+  70% {transform:scale(1.02) translateY(-2px);box-shadow:0 6px 20px rgba(255,107,26,.4)}
+  100%{transform:scale(1)    translateY(0);   box-shadow:none}
+}
+.sl-item.just-inserted{
+  animation:landBounce .4s cubic-bezier(.34,1.56,.64,1) forwards;
+  border-color:var(--acc)!important;
+  background:#ff6b1a18!important;
+}
 /* DRAG GHOST */
 #drag-ghost{
   position:fixed;z-index:999;pointer-events:none;
@@ -192,7 +237,17 @@ nav{background:#0a0a0a;border-bottom:1px solid var(--border);padding:11px 16px;p
 .sl-list{padding:6px 8px;min-height:48px}
 .sl-empty{text-align:center;padding:22px;font-size:12px;color:var(--muted);line-height:1.8}
 .sl-item{display:flex;align-items:center;gap:7px;padding:9px 8px;border-radius:9px;margin-bottom:4px;background:var(--surface2);border:1px solid var(--border);cursor:grab;touch-action:none;transition:.15s}
-.sl-item.mc-item{background:var(--surface3)}
+/* 奇数：オレンジ系 */
+.sl-item.odd{background:#2a1800;border-color:#7a4000;border-left:4px solid #ff6b1a}
+.sl-item.odd .item-name{color:#ffb87a!important}
+.sl-item.odd .item-num{background:#ff6b1a33;color:#ff9d5c!important;border:1px solid #ff6b1a66}
+/* 偶数：ブルー系 */
+.sl-item.even{background:#001828;border-color:#004878;border-left:4px solid #3498db}
+.sl-item.even .item-name{color:#7ec8f8!important}
+.sl-item.even .item-num{background:#3498db33;color:#74b9ff!important;border:1px solid #3498db66}
+/* MC */
+.sl-item.mc-item{background:#1a0a2a!important;border-color:#5a2a8a!important;border-left:4px solid #9b59b6!important}
+.sl-item.mc-item .item-name{color:#d7a8f8!important;font-style:italic}
 .sl-item.over{border-color:var(--acc);background:#ff6b1a12}
 .drag-handle{color:var(--muted2);font-size:16px;flex-shrink:0}
 .item-num{width:24px;height:24px;border-radius:50%;background:#ff6b1a22;color:var(--acc);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -389,6 +444,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5)}
           <button class="chip" onclick="pick(this,'a-pa',event)">アコギに持ち替え</button>
           <button class="chip" onclick="pick(this,'a-pa',event)">静かに始まる</button>
         </div>
+        <input type="text" id="a-pa-text" placeholder="その他、PAへの要望を自由に入力" style="margin-top:8px">
       </div>
       <div class="fg" id="f-note" style="display:none"><div class="fg-lbl">内容・メモ</div>
         <input type="text" id="a-note" placeholder="例：自己紹介・次の曲の説明など">
@@ -467,6 +523,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5)}
         <button class="chip" onclick="pick(this,'pe-pa',event)">アコギに持ち替え</button>
         <button class="chip" onclick="pick(this,'pe-pa',event)">静かに始まる</button>
       </div>
+      <input type="text" id="pe-pa-text" placeholder="その他、PAへの要望を自由に入力" style="margin-top:8px">
     </div>
   </div>
   <div class="pfg"><label class="pfl">その他メモ</label><input type="text" id="pe-note" placeholder="照明・演出・その他"></div>
@@ -739,11 +796,13 @@ function openForm(mode){
   form.classList.add('open');
   setTimeout(()=>document.getElementById('a-name').focus(),100);
 }
-function closeForm(){document.getElementById('add-form').classList.remove('open');document.querySelectorAll('.trig-btn').forEach(b=>b.classList.remove('active'));formMode=null;}
+function closeForm(){document.getElementById('add-form').classList.remove('open');document.querySelectorAll('.trig-btn').forEach(b=>b.classList.remove('active'));formMode=null;document.getElementById('a-pa-text').value='';}
 function doAdd(){
   const name=document.getElementById('a-name').value.trim(),dur=document.getElementById('a-dur').value.trim();
   if(formMode==='song'&&!name){document.getElementById('a-name').focus();return;}
-  items.push({id:seq++,type:formMode,name:name||(formMode==='mc'?'MC':'転換'),dur,tempo:gv('a-tempo'),light:gv('a-light'),pa:gv('a-pa'),note:document.getElementById('a-note').value.trim()});
+  const paText=document.getElementById('a-pa-text').value.trim();
+  const paCombined=gv('a-pa')==='おまかせ'?(paText||'おまかせ'):(gv('a-pa')+(paText?' / '+paText:''));
+  items.push({id:seq++,type:formMode,name:name||(formMode==='mc'?'MC':'転換'),dur,tempo:gv('a-tempo'),light:gv('a-light'),pa:paCombined,note:document.getElementById('a-note').value.trim()});
   closeForm();render();autoSave();showToast('追加しました ✓');
 }
 
@@ -772,7 +831,8 @@ function render(){
       if(it.light&&it.light!=='おまかせ')tags.push(`<span class="tag tag-light">💡 ${it.light}</span>`);
       if(it.pa&&it.pa!=='おまかせ')tags.push(`<span class="tag tag-pa">🎚 ${it.pa}</span>`);
       if(it.note)tags.push(`<span class="tag">📝 ${it.note}</span>`);
-      return`<div class="sl-item${isMC?' mc-item':''}" id="si-${it.id}" draggable="true" ondragstart="ds(event,${idx})" ondragover="dov(event,${idx})" ondrop="dp(event,${idx})" ondragend="de()" ontouchstart="ts(event,${idx})" ontouchmove="tm(event)" ontouchend="te(event,${idx})">
+      const parityClass=isMC?'':sn%2===0?'even':'odd';
+      return`<div class="sl-item${isMC?' mc-item':''} ${parityClass}" id="si-${it.id}" draggable="true" ondragstart="ds(event,${idx})" ondragover="dov(event,${idx})" ondrop="dp(event,${idx})" ondragend="de()" ontouchstart="ts(event,${idx})" ontouchmove="tm(event)" ontouchend="te(event,${idx})">
         <span class="drag-handle">⠿</span><span class="item-num">${ndisp}</span>
         <div class="item-body"><div class="item-name${isMC?' mc-name':''}">${it.name}</div>
         <div class="item-meta"><span class="item-dur">${dur}</span>${tags.join('')}</div></div>
@@ -904,7 +964,14 @@ function openP(id){
   editId=id;const it=items.find(i=>i.id===id);if(!it)return;
   document.getElementById('pop-ttl').textContent=it.type==='song'?'曲を編集':it.type==='mc'?'MCを編集':'SE/転換を編集';
   document.getElementById('pe-name').value=it.name;document.getElementById('pe-dur').value=it.dur||'';document.getElementById('pe-note').value=it.note||'';
-  sc('pe-tempo',it.tempo||'普通');sc('pe-light',it.light||'おまかせ');sc('pe-pa',it.pa||'おまかせ');
+  sc('pe-tempo',it.tempo||'普通');sc('pe-light',it.light||'おまかせ');
+  // PAはチップとテキストを分離して復元
+  const paVal=it.pa||'おまかせ';
+  const chipVals=['おまかせ','Vo強め','Vo細め','Gt前に出して','Ba前に出して','Dr前に出して','アコギに持ち替え','静かに始まる'];
+  const matchedChip=chipVals.find(v=>paVal.startsWith(v))||'おまかせ';
+  const extraText=paVal.replace(matchedChip,'').replace(/^\s*\/\s*/,'').trim();
+  sc('pe-pa',matchedChip);
+  document.getElementById('pe-pa-text').value=extraText;
   document.getElementById('pe-song-opts').style.display=it.type==='song'?'':'none';
   document.getElementById('pov').classList.add('open');
 }
@@ -977,15 +1044,15 @@ function ts(e,i){
   longPressActive=false;touchSrc=null;dragOver=null;insertIdx=null;touchMoved=false;
   touchStartX=e.touches[0].clientX;
   touchStartY=e.touches[0].clientY;
+  const delay = editMode ? 0 : 99999; // 編集モード：即ドラッグ / 閲覧モード：実質無効
   longPressTimer=setTimeout(()=>{
     if(touchMoved)return;
     longPressActive=true; touchSrc=i;
     const el=document.getElementById('si-'+items[i]?.id);
-    if(el)el.classList.add('long-press-active','dragging-src');
+    if(el)el.classList.add('grabbing');
     showGhost(i, touchStartX, touchStartY);
-    try{navigator.vibrate&&navigator.vibrate([40,30,40]);}catch(e2){}
-    showToast('そのままスライドして移動');
-  },500);
+    try{navigator.vibrate&&navigator.vibrate([25]);}catch(e2){}
+  },delay);
 }
 
 function tm(e){
@@ -993,26 +1060,56 @@ function tm(e){
   const cy=e.touches[0].clientY;
 
   if(!longPressActive){
-    // 長押し前：6px以上動いたらキャンセル → スクロール通す
     if(Math.abs(cx-touchStartX)>6||Math.abs(cy-touchStartY)>6){
       touchMoved=true;
       clearTimeout(longPressTimer);
     }
-    return; // preventDefault しない → スクロール自由
+    return;
   }
 
-  // 長押し確定後のドラッグ処理
   e.preventDefault();
   moveGhost(cx, cy);
 
+  // 動き始めたらgrabbing→dragging-srcに切り替え
+  const srcEl=document.getElementById('si-'+items[touchSrc]?.id);
+  if(srcEl&&srcEl.classList.contains('grabbing')){
+    srcEl.classList.remove('grabbing');
+    srcEl.classList.add('dragging-src');
+  }
+
+  let newInsertIdx=null, newDragOver=null;
   document.querySelectorAll('.sl-item').forEach((el,idx)=>{
     el.classList.remove('insert-above','insert-below');
     if(idx===touchSrc)return;
     const r=el.getBoundingClientRect();
     if(cy>=r.top-6&&cy<=r.bottom+6){
-      if(cy<r.top+r.height/2){el.classList.add('insert-above');insertIdx=idx;}
-      else{el.classList.add('insert-below');insertIdx=idx+1;}
-      dragOver=idx;
+      if(cy<r.top+r.height/2){el.classList.add('insert-above');newInsertIdx=idx;}
+      else{el.classList.add('insert-below');newInsertIdx=idx+1;}
+      newDragOver=idx;
+    }
+  });
+
+  // リアルタイムshift: 挿入位置が変わったら周囲の曲をずらす
+  if(newInsertIdx!==insertIdx){
+    insertIdx=newInsertIdx; dragOver=newDragOver;
+    applyShift(touchSrc, insertIdx);
+  }
+}
+
+function applyShift(srcIdx, targetIdx){
+  if(targetIdx===null){
+    document.querySelectorAll('.sl-item').forEach(el=>{el.classList.remove('shift-down','shift-up');});
+    return;
+  }
+  document.querySelectorAll('.sl-item').forEach((el,idx)=>{
+    el.classList.remove('shift-down','shift-up');
+    if(idx===srcIdx)return;
+    if(targetIdx<=srcIdx){
+      // 上に移動：targetIdx〜srcIdx-1 の曲を下にずらす
+      if(idx>=targetIdx&&idx<srcIdx) el.classList.add('shift-down');
+    } else {
+      // 下に移動：srcIdx+1〜targetIdx-1 の曲を上にずらす
+      if(idx>srcIdx&&idx<targetIdx) el.classList.add('shift-up');
     }
   });
 }
@@ -1021,7 +1118,7 @@ function te(e,i){
   clearTimeout(longPressTimer);
   hideGhost();
   document.querySelectorAll('.sl-item').forEach(el=>
-    el.classList.remove('insert-above','insert-below','long-press-active','dragging-src')
+    el.classList.remove('insert-above','insert-below','long-press-active','dragging-src','shift-down','shift-up','grabbing')
   );
   if(longPressActive&&touchSrc!==null&&insertIdx!==null&&insertIdx!==touchSrc&&insertIdx!==touchSrc+1){
     const moved=items.splice(touchSrc,1)[0];
@@ -1035,32 +1132,19 @@ function te(e,i){
 
 // ===== TOAST =====
 function animateInsert(movedId, insertedAt, origSrc, total){
-  // origSrc: 元の位置, insertedAt: 新しい位置
   render();
   setTimeout(()=>{
-    items.forEach((it, idx)=>{
-      const el=document.getElementById('si-'+it.id);
-      if(!el)return;
-      // 移動した曲
-      if(it.id===movedId){
-        const fromAbove=origSrc<insertedAt;
-        el.classList.remove('anim-in-down','anim-in-up','just-inserted');
-        void el.offsetWidth;
-        el.classList.add(fromAbove?'anim-in-down':'anim-in-up');
-        setTimeout(()=>el.classList.remove('anim-in-down','anim-in-up'),300);
-        return;
-      }
-      // 影響を受けた周囲の曲をnudge
-      const min=Math.min(origSrc,insertedAt);
-      const max=Math.max(origSrc,insertedAt);
-      if(idx>=min&&idx<=max){
-        const nudgeDir=origSrc>insertedAt?'anim-nudge-down':'anim-nudge-up';
-        el.classList.remove('anim-nudge-down','anim-nudge-up');
-        void el.offsetWidth;
-        el.classList.add(nudgeDir);
-        setTimeout(()=>el.classList.remove('anim-nudge-down','anim-nudge-up'),250);
-      }
+    // 全shiftクラスをまずクリア
+    document.querySelectorAll('.sl-item').forEach(el=>{
+      el.classList.remove('shift-down','shift-up','anim-nudge-down','anim-nudge-up');
     });
+    // 移動した曲に着地アニメ
+    const movedEl=document.getElementById('si-'+movedId);
+    if(movedEl){
+      void movedEl.offsetWidth;
+      movedEl.classList.add('just-inserted');
+      setTimeout(()=>movedEl.classList.remove('just-inserted'),500);
+    }
   },10);
 }
 
