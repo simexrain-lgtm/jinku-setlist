@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>セットリスト入力 — SOUNDHOPE FEST.2026</title>
+<title>セットリスト入力 — 江刺甚句まつり</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -127,7 +127,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5)}
 <body>
 <nav>
   <div class="nav-inner">
-    <span class="nav-logo">🎵 SOUNDHOPE FEST.2026</span>
+    <span class="nav-logo">🎵 江刺甚句まつり</span>
     <span class="save-indicator">
       <span class="save-dot" id="save-dot"></span>
       <span id="save-label">未保存</span>
@@ -142,7 +142,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5)}
     <div class="event-fields">
       <div class="event-field full">
         <span class="field-label">イベント名</span>
-        <input type="text" id="event-name" placeholder="例：SOUNDHOPE FEST.2026" oninput="autoSave()">
+        <input type="text" id="event-name" placeholder="例：江刺甚句まつり" oninput="autoSave()">
       </div>
       <div class="event-field">
         <span class="field-label">開催日</span>
@@ -150,7 +150,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5)}
       </div>
       <div class="event-field">
         <span class="field-label">会場</span>
-        <input type="text" id="event-venue" placeholder="例：Mizusawa Z Arena" oninput="autoSave()">
+        <input type="text" id="event-venue" placeholder="例：江刺大通公園" oninput="autoSave()">
       </div>
     </div>
   </div>
@@ -380,9 +380,9 @@ function newSession(){
   currentId='s'+Date.now();
   items=[];seq=1;
   document.getElementById('band-name').value='';
-  document.getElementById('event-name').value='SOUNDHOPE FEST.2026';
-  document.getElementById('event-date').value='2026-06-27';
-  document.getElementById('event-venue').value='Mizusawa Z Arena';
+  document.getElementById('event-name').value='江刺甚句まつり';
+  document.getElementById('event-date').value='2026-05-03';
+  document.getElementById('event-venue').value='江刺大通公園';
   document.getElementById('limit').value=30;
   document.getElementById('save-dot').classList.remove('saved');
   document.getElementById('save-label').textContent='新規';
@@ -577,20 +577,66 @@ function te(e,i){document.querySelectorAll('.sl-item').forEach(el=>el.classList.
 function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);}
 document.addEventListener('keydown',e=>{if(e.key==='Enter'&&formMode&&document.activeElement.closest('.add-form'))doAdd();});
 
+// PRESET DATA
+const PRESETS = [
+  {
+    id:'preset_gg',
+    bandName:'グッバイグッピー',
+    eventName:'江刺甚句まつり',
+    eventDate:'2026-05-03',
+    eventVenue:'江刺大通公園',
+    limit:'30',
+    seq:8,
+    updatedAt:new Date().toISOString(),
+    sentAt:null,
+    items:[
+      {id:1,type:'song',name:'ブルースター',      dur:'3:36',tempo:'普通',light:'おまかせ',pa:'おまかせ',note:''},
+      {id:2,type:'song',name:'桜の花は知っている',dur:'3:00',tempo:'普通',light:'おまかせ',pa:'おまかせ',note:''},
+      {id:3,type:'song',name:'並木道',            dur:'4:44',tempo:'普通',light:'おまかせ',pa:'おまかせ',note:''},
+      {id:4,type:'song',name:'腕時計',            dur:'4:48',tempo:'普通',light:'おまかせ',pa:'おまかせ',note:''},
+      {id:5,type:'song',name:'夏油',              dur:'5:00',tempo:'普通',light:'おまかせ',pa:'おまかせ',note:''},
+      {id:6,type:'mc',  name:'良太くん登場',      dur:'5:00',tempo:'普通',light:'おまかせ',pa:'おまかせ',note:''},
+      {id:7,type:'song',name:'スタンドバイミー',  dur:'5:00',tempo:'普通',light:'おまかせ',pa:'おまかせ',note:''},
+    ]
+  },
+  {
+    id:'preset_bpc',
+    bandName:'Bull Pain Catcher',
+    eventName:'江刺甚句まつり',
+    eventDate:'2026-05-03',
+    eventVenue:'江刺大通公園',
+    limit:'30',
+    seq:1,
+    updatedAt:new Date().toISOString(),
+    sentAt:null,
+    items:[]
+  },
+  {
+    id:'preset_shika',
+    bandName:'鹿ROCK',
+    eventName:'江刺甚句まつり',
+    eventDate:'2026-05-03',
+    eventVenue:'江刺大通公園',
+    limit:'30',
+    seq:1,
+    updatedAt:new Date().toISOString(),
+    sentAt:null,
+    items:[]
+  },
+];
+
 // INIT
 (function(){
   try{
     const lastId=localStorage.getItem(CK);
-    const sessions=getSessions();
+    let sessions=getSessions();
+    // プリセットがまだ保存されていなければ追加
+    PRESETS.forEach(p=>{
+      if(!sessions.find(s=>s.id===p.id)) sessions.push(p);
+    });
+    saveSessions(sessions);
     if(lastId&&sessions.find(s=>s.id===lastId)){loadSession(lastId);}
-    else if(sessions.length>0){loadSession(sessions[0].id);}
-    else{
-      currentId='s'+Date.now();
-      document.getElementById('event-name').value='SOUNDHOPE FEST.2026';
-      document.getElementById('event-date').value='2026-06-27';
-      document.getElementById('event-venue').value='Mizusawa Z Arena';
-      render();renderSaved();
-    }
+    else{loadSession('preset_gg');}
   }catch(e){currentId='s'+Date.now();render();renderSaved();}
 })();
 </script>
