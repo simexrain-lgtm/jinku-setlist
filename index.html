@@ -7,59 +7,47 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
-:root{
-  --bg:#0f0f0f;--surface:#1a1a1a;--surface2:#222;--surface3:#2a2a2a;
-  --border:#333;--border2:#444;
-  --acc:#ff6b1a;--acc2:#ff9d5c;
-  --text:#f0ede8;--muted:#888;--muted2:#555;
-  --success:#2ecc71;--danger:#e74c3c;--warn:#f39c12;--info:#3498db;
-}
-body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;padding-bottom:40px}
-
-/* NAV */
-nav{background:#0a0a0a;border-bottom:1px solid var(--border);padding:12px 16px;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+:root{--bg:#0f0f0f;--surface:#1a1a1a;--surface2:#222;--surface3:#2a2a2a;--border:#333;--border2:#444;--acc:#ff6b1a;--acc2:#ff9d5c;--text:#f0ede8;--muted:#888;--muted2:#555;--success:#2ecc71;--danger:#e74c3c;--warn:#f39c12;--info:#3498db;}
+body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;padding-bottom:60px}
+nav{background:#0a0a0a;border-bottom:1px solid var(--border);padding:11px 16px;position:sticky;top:0;z-index:100}
 .nav-inner{max-width:600px;margin:0 auto;display:flex;align-items:center;justify-content:space-between}
 .nav-logo{font-size:13px;font-weight:700;color:var(--acc);letter-spacing:.08em}
-.nav-sub{font-size:11px;color:var(--muted)}
-
-/* LAYOUT */
+.save-indicator{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:5px}
+.save-dot{width:7px;height:7px;border-radius:50%;background:var(--muted);transition:.3s}
+.save-dot.saved{background:var(--success)}
 .container{max-width:600px;margin:0 auto;padding:14px 14px 0}
-
-/* BAND NAME */
-.band-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
+.event-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:10px}
+.event-card-title{font-size:10px;color:var(--acc);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px}
+.event-fields{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.event-field{display:flex;flex-direction:column;gap:5px}
+.event-field.full{grid-column:1/-1}
+.field-label{font-size:10px;color:var(--muted);font-weight:500;letter-spacing:.05em;text-transform:uppercase}
+input,select,textarea{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 12px;font-size:14px;font-family:'Noto Sans JP',sans-serif;outline:none;transition:.2s;width:100%}
+input:focus,select:focus,textarea:focus{border-color:var(--acc);background:var(--surface3)}
+input::placeholder,textarea::placeholder{color:var(--muted2)}
+input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5)}
+.band-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:12px 14px}
 .band-label{font-size:12px;color:var(--muted);font-weight:500;white-space:nowrap}
 .band-input{flex:1;background:transparent;border:none;color:var(--text);font-size:16px;font-weight:700;outline:none;font-family:'Noto Sans JP',sans-serif}
 .band-input::placeholder{color:var(--muted2)}
-
-/* SUMMARY */
 .summary{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:12px;overflow:hidden;margin-bottom:10px}
 .sum-cell{background:var(--surface);padding:10px 8px;text-align:center}
 .sum-lbl{font-size:10px;color:var(--muted);margin-bottom:3px}
 .sum-val{font-size:20px;font-weight:700;color:var(--text)}
-.sum-val.warn{color:var(--danger)}
-.sum-val.ok{color:var(--success)}
-
-/* TIMELINE BAR */
+.sum-val.warn{color:var(--danger)}.sum-val.ok{color:var(--success)}
 .tl-bar{height:5px;background:var(--surface2);border-radius:3px;margin-bottom:10px;overflow:hidden;display:flex;gap:1px}
-.tl-seg{height:100%;border-radius:2px;transition:.3s}
-.tl-song{background:var(--acc)}
-.tl-mc{background:var(--info)}
-
-/* PANEL */
+.tl-song{background:var(--acc)}.tl-mc{background:var(--info)}
 .panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;margin-bottom:10px;overflow:hidden}
 .panel-hd{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px}
 .panel-title{font-size:13px;font-weight:500;color:var(--text)}
 .limit-row{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted)}
-.limit-row input{width:36px;padding:3px 5px;font-size:11px;border-radius:6px;background:var(--surface2);border:1px solid var(--border);color:var(--text);text-align:center;font-family:'Noto Sans JP',sans-serif}
-
-/* SETLIST */
+.limit-row input{width:36px;padding:3px 5px;font-size:11px;border-radius:6px;text-align:center}
 .sl-list{padding:6px 8px;min-height:48px}
 .sl-empty{text-align:center;padding:22px;font-size:12px;color:var(--muted);line-height:1.8}
 .sl-item{display:flex;align-items:center;gap:7px;padding:9px 8px;border-radius:9px;margin-bottom:4px;background:var(--surface2);border:1px solid var(--border);cursor:grab;touch-action:none;transition:.15s}
-.sl-item:hover{border-color:var(--border2)}
-.sl-item.mc-item{background:var(--surface3);border-color:var(--border)}
+.sl-item.mc-item{background:var(--surface3)}
 .sl-item.over{border-color:var(--acc);background:#ff6b1a12}
-.drag-handle{color:var(--muted2);font-size:16px;flex-shrink:0;line-height:1}
+.drag-handle{color:var(--muted2);font-size:16px;flex-shrink:0}
 .item-num{width:24px;height:24px;border-radius:50%;background:#ff6b1a22;color:var(--acc);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .mc-item .item-num{background:#3498db22;color:var(--info)}
 .item-body{flex:1;min-width:0}
@@ -76,72 +64,49 @@ nav{background:#0a0a0a;border-bottom:1px solid var(--border);padding:12px 16px;p
 .act-btn{background:transparent;border:1px solid var(--border);border-radius:6px;padding:4px 9px;cursor:pointer;font-size:11px;color:var(--muted);transition:.15s;font-family:'Noto Sans JP',sans-serif}
 .act-btn:hover{border-color:var(--acc);color:var(--acc)}
 .act-btn.del:hover{border-color:var(--danger);color:var(--danger)}
-
-/* ADD TRIGGERS */
 .add-triggers{display:flex;gap:8px;padding:10px;border-top:1px solid var(--border)}
 .trig-btn{flex:1;padding:10px 8px;border-radius:9px;border:1px dashed var(--border2);background:transparent;color:var(--muted);cursor:pointer;font-size:12px;font-weight:500;transition:.15s;text-align:center;font-family:'Noto Sans JP',sans-serif}
-.trig-btn:hover{border-color:var(--acc);color:var(--acc);background:#ff6b1a0a}
+.trig-btn:hover{border-color:var(--acc);color:var(--acc)}
 .trig-btn.active{border-style:solid;border-color:var(--acc);color:var(--acc);background:#ff6b1a0f}
-
-/* ADD FORM */
 .add-form{display:none;padding:14px;border-top:1px solid var(--border);background:var(--surface3)}
 .add-form.open{display:block}
 .form-hd{font-size:12px;font-weight:700;color:var(--acc);margin-bottom:11px;display:flex;justify-content:space-between;align-items:center}
-.form-close{background:transparent;border:none;cursor:pointer;font-size:13px;color:var(--muted);padding:0 4px;font-family:'Noto Sans JP',sans-serif}
+.form-close{background:transparent;border:none;cursor:pointer;font-size:13px;color:var(--muted);font-family:'Noto Sans JP',sans-serif}
 .form-name-row{display:flex;gap:7px;margin-bottom:10px}
 .form-name-row input{flex:1;font-size:14px}
 .w-dur{width:74px;flex:none;text-align:center}
 .fg{margin-bottom:10px}
 .fg-lbl{font-size:10px;color:var(--muted);font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
-
-/* CHIPS */
 .chips{display:flex;flex-wrap:wrap;gap:6px}
-.chip{
-  padding:7px 14px;border-radius:20px;
-  border:1px solid var(--border2);
-  background:var(--surface2);color:var(--muted);
-  cursor:pointer;font-size:12px;
-  position:relative;overflow:hidden;
-  transition:color .15s,border-color .15s,background .15s;
-  -webkit-user-select:none;user-select:none;
-  font-family:'Noto Sans JP',sans-serif;
-}
+.chip{padding:7px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);cursor:pointer;font-size:12px;position:relative;overflow:hidden;transition:color .15s,border-color .15s,background .15s;-webkit-user-select:none;user-select:none;font-family:'Noto Sans JP',sans-serif}
 .chip.on{background:var(--acc);color:#000;border-color:var(--acc);font-weight:700}
-.chip:hover:not(.on){border-color:var(--border2);color:var(--text)}
+.chip:hover:not(.on){color:var(--text)}
 .chip .rpl{position:absolute;border-radius:50%;background:rgba(255,255,255,.45);transform:scale(0);animation:rpl .35s ease-out forwards;pointer-events:none}
 @keyframes rpl{to{transform:scale(4);opacity:0}}
 @keyframes popscale{0%{transform:scale(1)}50%{transform:scale(1.11)}100%{transform:scale(1)}}
 .chip.pop{animation:popscale .18s ease-out}
-
 .add-confirm{width:100%;padding:12px;border-radius:9px;border:none;background:var(--acc);color:#000;font-size:14px;font-weight:700;cursor:pointer;margin-top:6px;transition:.15s;font-family:'Noto Sans JP',sans-serif}
 .add-confirm:hover{background:var(--acc2)}
-
-/* INPUTS */
-input,textarea{background:var(--surface2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:9px 12px;font-size:14px;font-family:'Noto Sans JP',sans-serif;outline:none;transition:.2s;width:100%}
-input:focus,textarea:focus{border-color:var(--acc);background:var(--surface3)}
-input::placeholder,textarea::placeholder{color:var(--muted2)}
-
-/* SEND BUTTON */
-.send-btn{
-  width:100%;padding:14px;border-radius:10px;
-  border:none;background:#27ae60;color:#fff;
-  font-size:15px;font-weight:700;cursor:pointer;
-  display:flex;align-items:center;justify-content:center;gap:9px;
-  transition:.15s;margin-bottom:10px;font-family:'Noto Sans JP',sans-serif;
-}
+/* SAVED */
+.saved-item{padding:11px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:pointer;transition:.15s}
+.saved-item:last-child{border-bottom:none}
+.saved-item:hover{background:var(--surface2)}
+.saved-item.active{background:var(--surface2);border-left:3px solid var(--acc)}
+.saved-item-band{font-size:13px;font-weight:500;color:var(--text)}
+.saved-item-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.saved-empty{padding:16px 14px;font-size:12px;color:var(--muted);text-align:center}
+/* SEND */
+.send-btn{width:100%;padding:14px;border-radius:10px;border:none;background:#27ae60;color:#fff;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:.15s;margin-bottom:10px;font-family:'Noto Sans JP',sans-serif}
 .send-btn:hover{background:#229954}
 .send-btn:disabled{background:var(--surface3);color:var(--muted);cursor:not-allowed}
 .send-result{padding:11px 14px;border-radius:9px;font-size:13px;text-align:center;margin-bottom:10px;display:none;line-height:1.6}
 .send-ok{background:#0d2b1a;color:var(--success);border:1px solid #1a4a2a}
 .send-err{background:#2b0d0d;color:var(--danger);border:1px solid #4a1a1a}
-
-/* OUTPUT */
-.output-panel .panel-hd{cursor:pointer}
 .output-pre{padding:12px 14px;font-size:12px;line-height:1.9;color:var(--text);white-space:pre-wrap;font-family:'Courier New',monospace;overflow-x:auto;display:none}
 .output-pre.open{display:block}
 .btn-sm{padding:5px 11px;border-radius:7px;border:1px solid var(--border2);background:transparent;color:var(--muted);cursor:pointer;font-size:11px;transition:.15s;font-family:'Noto Sans JP',sans-serif}
 .btn-sm:hover{border-color:var(--acc);color:var(--acc)}
-
+.btn-sm.danger:hover{border-color:var(--danger);color:var(--danger)}
 /* POPUP */
 .pov{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:.2s}
 .pov.open{opacity:1;pointer-events:all}
@@ -155,31 +120,46 @@ input::placeholder,textarea::placeholder{color:var(--muted2)}
 .brow{display:flex;gap:9px;margin-top:16px}
 .btn-acc{padding:11px;border-radius:9px;border:none;cursor:pointer;font-size:13px;font-weight:700;flex:1;background:var(--acc);color:#000;font-family:'Noto Sans JP',sans-serif}
 .btn-del{padding:11px;border-radius:9px;border:1px solid #5a1a1a;cursor:pointer;font-size:13px;font-weight:700;flex:1;background:#2b0d0d;color:var(--danger);font-family:'Noto Sans JP',sans-serif}
-.sep{border:none;border-top:1px solid var(--border);margin:12px 0}
-
-/* TOAST */
 .toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(60px);background:var(--surface2);border:1px solid var(--acc);color:var(--text);padding:10px 18px;border-radius:10px;font-size:13px;opacity:0;transition:.3s;z-index:999;pointer-events:none;white-space:nowrap}
 .toast.show{transform:translateX(-50%) translateY(0);opacity:1}
 </style>
 </head>
 <body>
-
 <nav>
   <div class="nav-inner">
     <span class="nav-logo">🎵 SOUNDHOPE FEST.2026</span>
-    <span class="nav-sub">セットリスト入力</span>
+    <span class="save-indicator">
+      <span class="save-dot" id="save-dot"></span>
+      <span id="save-label">未保存</span>
+    </span>
   </div>
 </nav>
 
 <div class="container">
 
-  <!-- バンド名 -->
-  <div class="band-row">
-    <span class="band-label">バンド名</span>
-    <input type="text" class="band-input" id="band-name" placeholder="バンド名を入力してください" oninput="render()">
+  <div class="event-card">
+    <div class="event-card-title">📅 イベント情報</div>
+    <div class="event-fields">
+      <div class="event-field full">
+        <span class="field-label">イベント名</span>
+        <input type="text" id="event-name" placeholder="例：SOUNDHOPE FEST.2026" oninput="autoSave()">
+      </div>
+      <div class="event-field">
+        <span class="field-label">開催日</span>
+        <input type="date" id="event-date" oninput="autoSave()">
+      </div>
+      <div class="event-field">
+        <span class="field-label">会場</span>
+        <input type="text" id="event-venue" placeholder="例：Mizusawa Z Arena" oninput="autoSave()">
+      </div>
+    </div>
   </div>
 
-  <!-- サマリー -->
+  <div class="band-row">
+    <span class="band-label">バンド名</span>
+    <input type="text" class="band-input" id="band-name" placeholder="バンド名を入力してください" oninput="autoSave()">
+  </div>
+
   <div class="summary">
     <div class="sum-cell"><div class="sum-lbl">総時間</div><div class="sum-val" id="s-total">0:00</div></div>
     <div class="sum-cell"><div class="sum-lbl">曲数</div><div class="sum-val" id="s-songs">0曲</div></div>
@@ -187,51 +167,31 @@ input::placeholder,textarea::placeholder{color:var(--muted2)}
   </div>
   <div class="tl-bar" id="tl-bar"></div>
 
-  <!-- セットリスト -->
   <div class="panel">
     <div class="panel-hd">
       <div class="panel-title">🎵 セットリスト</div>
-      <div class="limit-row">
-        持ち時間
-        <input type="number" id="limit" value="30" min="5" max="90" oninput="render()">
-        分
-      </div>
+      <div class="limit-row">持ち時間 <input type="number" id="limit" value="30" min="5" max="90" oninput="render()"> 分</div>
     </div>
-
-    <div id="sl-list" class="sl-list">
-      <div class="sl-empty">まだ曲がありません<br>下の「曲を追加」ボタンから追加してください</div>
-    </div>
-
-    <!-- 追加トリガー -->
+    <div id="sl-list" class="sl-list"><div class="sl-empty">まだ曲がありません<br>下の「曲を追加」ボタンから追加してください</div></div>
     <div class="add-triggers">
       <button class="trig-btn" id="trig-song" onclick="openForm('song')">🎵 曲を追加</button>
-      <button class="trig-btn" id="trig-mc"   onclick="openForm('mc')">🎤 MC</button>
-      <button class="trig-btn" id="trig-se"   onclick="openForm('se')">🔄 SE/転換</button>
+      <button class="trig-btn" id="trig-mc" onclick="openForm('mc')">🎤 MC</button>
+      <button class="trig-btn" id="trig-se" onclick="openForm('se')">🔄 SE/転換</button>
     </div>
-
-    <!-- 追加フォーム -->
     <div class="add-form" id="add-form">
-      <div class="form-hd">
-        <span id="form-title">曲を追加</span>
-        <button class="form-close" onclick="closeForm()">✕ 閉じる</button>
-      </div>
-
+      <div class="form-hd"><span id="form-title">曲を追加</span><button class="form-close" onclick="closeForm()">✕ 閉じる</button></div>
       <div class="form-name-row">
         <input type="text" id="a-name" placeholder="曲名を入力">
         <input type="text" id="a-dur" placeholder="3:45" class="w-dur">
       </div>
-
-      <div class="fg" id="f-tempo">
-        <div class="fg-lbl">テンポ</div>
+      <div class="fg" id="f-tempo"><div class="fg-lbl">テンポ</div>
         <div class="chips" id="a-tempo">
           <button class="chip" onclick="pick(this,'a-tempo',event)">🐢 遅い</button>
           <button class="chip on" onclick="pick(this,'a-tempo',event)">🚶 普通</button>
           <button class="chip" onclick="pick(this,'a-tempo',event)">🔥 速い</button>
         </div>
       </div>
-
-      <div class="fg" id="f-light">
-        <div class="fg-lbl">💡 照明イメージ</div>
+      <div class="fg" id="f-light"><div class="fg-lbl">💡 照明イメージ</div>
         <div class="chips" id="a-light">
           <button class="chip on" onclick="pick(this,'a-light',event)">おまかせ</button>
           <button class="chip" onclick="pick(this,'a-light',event)">暖色系</button>
@@ -241,9 +201,7 @@ input::placeholder,textarea::placeholder{color:var(--muted2)}
           <button class="chip" onclick="pick(this,'a-light',event)">ストロボOK</button>
         </div>
       </div>
-
-      <div class="fg" id="f-pa">
-        <div class="fg-lbl">🎚 PAへの希望</div>
+      <div class="fg" id="f-pa"><div class="fg-lbl">🎚 PAへの希望</div>
         <div class="chips" id="a-pa">
           <button class="chip on" onclick="pick(this,'a-pa',event)">おまかせ</button>
           <button class="chip" onclick="pick(this,'a-pa',event)">Vo強め</button>
@@ -255,25 +213,29 @@ input::placeholder,textarea::placeholder{color:var(--muted2)}
           <button class="chip" onclick="pick(this,'a-pa',event)">静かに始まる</button>
         </div>
       </div>
-
-      <div class="fg" id="f-note" style="display:none">
-        <div class="fg-lbl">内容・メモ</div>
+      <div class="fg" id="f-note" style="display:none"><div class="fg-lbl">内容・メモ</div>
         <input type="text" id="a-note" placeholder="例：自己紹介・次の曲の説明など">
       </div>
-
       <button class="add-confirm" onclick="doAdd()">追加する</button>
     </div>
   </div>
 
-  <!-- スプレッドシートに送信 -->
+  <!-- 保存済みデータ -->
+  <div class="panel">
+    <div class="panel-hd">
+      <div class="panel-title">💾 保存済みデータ</div>
+      <button class="btn-sm" onclick="newSession()">＋ 新規作成</button>
+    </div>
+    <div id="saved-list"></div>
+  </div>
+
   <div id="send-result" class="send-result"></div>
   <button class="send-btn" id="send-btn" onclick="sendToSheets()" disabled>
     <span>📊</span><span id="send-lbl">スプレッドシートに送信</span>
   </button>
 
-  <!-- PA・照明用出力 -->
-  <div class="panel output-panel">
-    <div class="panel-hd" onclick="toggleOutput()">
+  <div class="panel">
+    <div class="panel-hd" onclick="toggleOutput()" style="cursor:pointer">
       <div class="panel-title">🖨 PA・照明用セトリ（タップで展開）</div>
       <button class="btn-sm" onclick="event.stopPropagation();copyOut()">📋 コピー</button>
     </div>
@@ -285,33 +247,20 @@ input::placeholder,textarea::placeholder{color:var(--muted2)}
 <!-- 編集ポップアップ -->
 <div class="pov" id="pov">
 <div class="pop">
-  <div class="pop-hd">
-    <span id="pop-ttl">曲を編集</span>
-    <button class="pop-close" onclick="closeP()">✕</button>
-  </div>
-
-  <div class="pfg">
-    <label class="pfl">曲名 / 内容</label>
-    <input type="text" id="pe-name" placeholder="曲名">
-  </div>
+  <div class="pop-hd"><span id="pop-ttl">曲を編集</span><button class="pop-close" onclick="closeP()">✕</button></div>
+  <div class="pfg"><label class="pfl">曲名 / 内容</label><input type="text" id="pe-name" placeholder="曲名"></div>
   <div class="p2col">
-    <div>
-      <label class="pfl">時間（分:秒）</label>
-      <input type="text" id="pe-dur" placeholder="3:45">
-    </div>
-    <div>
-      <label class="pfl">テンポ</label>
-      <div class="chips" id="pe-tempo" style="margin-top:0">
+    <div><label class="pfl">時間（分:秒）</label><input type="text" id="pe-dur" placeholder="3:45"></div>
+    <div><label class="pfl">テンポ</label>
+      <div class="chips" id="pe-tempo">
         <button class="chip" onclick="pick(this,'pe-tempo',event)">🐢</button>
         <button class="chip on" onclick="pick(this,'pe-tempo',event)">🚶</button>
         <button class="chip" onclick="pick(this,'pe-tempo',event)">🔥</button>
       </div>
     </div>
   </div>
-
   <div id="pe-song-opts">
-    <div class="pfg">
-      <label class="pfl">💡 照明イメージ</label>
+    <div class="pfg"><label class="pfl">💡 照明イメージ</label>
       <div class="chips" id="pe-light">
         <button class="chip on" onclick="pick(this,'pe-light',event)">おまかせ</button>
         <button class="chip" onclick="pick(this,'pe-light',event)">暖色系</button>
@@ -321,8 +270,7 @@ input::placeholder,textarea::placeholder{color:var(--muted2)}
         <button class="chip" onclick="pick(this,'pe-light',event)">ストロボOK</button>
       </div>
     </div>
-    <div class="pfg">
-      <label class="pfl">🎚 PAへの希望</label>
+    <div class="pfg"><label class="pfl">🎚 PAへの希望</label>
       <div class="chips" id="pe-pa">
         <button class="chip on" onclick="pick(this,'pe-pa',event)">おまかせ</button>
         <button class="chip" onclick="pick(this,'pe-pa',event)">Vo強め</button>
@@ -335,12 +283,7 @@ input::placeholder,textarea::placeholder{color:var(--muted2)}
       </div>
     </div>
   </div>
-
-  <div class="pfg">
-    <label class="pfl">その他メモ</label>
-    <input type="text" id="pe-note" placeholder="照明・演出・その他">
-  </div>
-
+  <div class="pfg"><label class="pfl">その他メモ</label><input type="text" id="pe-note" placeholder="照明・演出・その他"></div>
   <div class="brow">
     <button class="btn-del" onclick="delItem()">削除</button>
     <button class="btn-acc" onclick="saveItem()">保存</button>
@@ -351,161 +294,193 @@ input::placeholder,textarea::placeholder{color:var(--muted2)}
 <div class="toast" id="toast"></div>
 
 <script>
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzmY7_MHDnBdea_WuRuR48V0adMa4JTbWZ-ULtGvMvQ8dieVLRoBguyHA-X52YWzTK4/exec';
+const GAS_URL='https://script.google.com/macros/s/AKfycbzmY7_MHDnBdea_WuRuR48V0adMa4JTbWZ-ULtGvMvQ8dieVLRoBguyHA-X52YWzTK4/exec';
+const SK='sh_sessions_v2', CK='sh_current_v2';
+let items=[],seq=1,editId=null,formMode=null;
+let dragSrc=null,dragOver=null,touchSrc=null;
+let actx=null,currentId=null,saveTimer=null;
 
-let items = [], seq = 1, editId = null, formMode = null;
-let dragSrc = null, dragOver = null, touchSrc = null;
-let actx = null;
+function getAC(){if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();return actx;}
+function playPop(on){try{const ac=getAC(),osc=ac.createOscillator(),g=ac.createGain();osc.connect(g);g.connect(ac.destination);osc.type='sine';osc.frequency.setValueAtTime(on?880:660,ac.currentTime);osc.frequency.exponentialRampToValueAtTime(on?1100:500,ac.currentTime+0.06);g.gain.setValueAtTime(0,ac.currentTime);g.gain.linearRampToValueAtTime(0.1,ac.currentTime+0.008);g.gain.exponentialRampToValueAtTime(0.0001,ac.currentTime+0.12);osc.start(ac.currentTime);osc.stop(ac.currentTime+0.13);}catch(e){}}
+function vib(on){try{navigator.vibrate&&navigator.vibrate(on?[18]:[8]);}catch(e){}}
 
-// ===== AUDIO & VIBRATE =====
-function getAC() {
-  if (!actx) actx = new (window.AudioContext || window.webkitAudioContext)();
-  return actx;
-}
-function playPop(on) {
-  try {
-    const ac = getAC(), osc = ac.createOscillator(), g = ac.createGain();
-    osc.connect(g); g.connect(ac.destination);
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(on ? 880 : 660, ac.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(on ? 1100 : 500, ac.currentTime + 0.06);
-    g.gain.setValueAtTime(0, ac.currentTime);
-    g.gain.linearRampToValueAtTime(0.1, ac.currentTime + 0.008);
-    g.gain.exponentialRampToValueAtTime(0.0001, ac.currentTime + 0.12);
-    osc.start(ac.currentTime); osc.stop(ac.currentTime + 0.13);
-  } catch(e) {}
-}
-function vib(on) { try { navigator.vibrate && navigator.vibrate(on ? [18] : [8]); } catch(e) {} }
-
-// ===== CHIP =====
-function pick(el, grp, e) {
-  const wasOn = el.classList.contains('on');
-  document.querySelectorAll('#' + grp + ' .chip').forEach(c => c.classList.remove('on'));
+function pick(el,grp,e){
+  const wasOn=el.classList.contains('on');
+  document.querySelectorAll('#'+grp+' .chip').forEach(c=>c.classList.remove('on'));
   el.classList.add('on');
-  if (e) {
-    const r = el.getBoundingClientRect();
-    const x = (e.touches ? e.touches[0].clientX : e.clientX) - r.left;
-    const y = (e.touches ? e.touches[0].clientY : e.clientY) - r.top;
-    const sz = Math.max(r.width, r.height);
-    const rpl = document.createElement('span');
-    rpl.className = 'rpl';
-    rpl.style.cssText = `width:${sz}px;height:${sz}px;left:${x - sz/2}px;top:${y - sz/2}px`;
-    el.appendChild(rpl); setTimeout(() => rpl.remove(), 400);
-  }
-  el.classList.remove('pop'); void el.offsetWidth; el.classList.add('pop');
-  setTimeout(() => el.classList.remove('pop'), 200);
-  playPop(!wasOn); vib(!wasOn);
+  if(e){const r=el.getBoundingClientRect();const x=(e.touches?e.touches[0].clientX:e.clientX)-r.left;const y=(e.touches?e.touches[0].clientY:e.clientY)-r.top;const sz=Math.max(r.width,r.height);const rpl=document.createElement('span');rpl.className='rpl';rpl.style.cssText=`width:${sz}px;height:${sz}px;left:${x-sz/2}px;top:${y-sz/2}px`;el.appendChild(rpl);setTimeout(()=>rpl.remove(),400);}
+  el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');setTimeout(()=>el.classList.remove('pop'),200);
+  playPop(!wasOn);vib(!wasOn);
 }
-function gv(grp) {
-  const o = document.querySelector('#' + grp + ' .chip.on');
-  return o ? o.textContent.replace(/^[🐢🚶🔥]\s*/u, '').trim() : '';
-}
-function sc(grp, val) {
-  document.querySelectorAll('#' + grp + ' .chip').forEach(c => {
-    const clean = c.textContent.replace(/^[🐢🚶🔥]\s*/u, '').trim();
-    c.classList.toggle('on', clean === val || c.textContent.trim() === val);
-  });
+function gv(grp){const o=document.querySelector('#'+grp+' .chip.on');return o?o.textContent.replace(/^[🐢🚶🔥]\s*/u,'').trim():'';}
+function sc(grp,val){document.querySelectorAll('#'+grp+' .chip').forEach(c=>{const clean=c.textContent.replace(/^[🐢🚶🔥]\s*/u,'').trim();c.classList.toggle('on',clean===val||c.textContent.trim()===val);});}
+
+function d2s(s){if(!s)return 0;const m=String(s).trim().match(/^(\d+):(\d{1,2})$/);if(m)return parseInt(m[1])*60+parseInt(m[2]);const n=parseFloat(s);return isNaN(n)?0:Math.round(n*60);}
+function s2t(s){s=Math.max(0,Math.round(s));return Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;}
+function total(){return items.reduce((a,it)=>a+d2s(it.dur),0);}
+
+function getSessions(){try{return JSON.parse(localStorage.getItem(SK)||'[]');}catch(e){return[];}}
+function saveSessions(s){try{localStorage.setItem(SK,JSON.stringify(s));}catch(e){}}
+
+function getFormData(){
+  return{
+    id:currentId,
+    bandName:document.getElementById('band-name').value,
+    eventName:document.getElementById('event-name').value,
+    eventDate:document.getElementById('event-date').value,
+    eventVenue:document.getElementById('event-venue').value,
+    limit:document.getElementById('limit').value,
+    items,seq,
+    updatedAt:new Date().toISOString()
+  };
 }
 
-// ===== TIME =====
-function d2s(s) {
-  if (!s) return 0;
-  const m = String(s).trim().match(/^(\d+):(\d{1,2})$/);
-  if (m) return parseInt(m[1]) * 60 + parseInt(m[2]);
-  const n = parseFloat(s); return isNaN(n) ? 0 : Math.round(n * 60);
+function autoSave(){
+  document.getElementById('save-dot').classList.remove('saved');
+  document.getElementById('save-label').textContent='保存中...';
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(()=>{
+    commitSave();
+    document.getElementById('save-dot').classList.add('saved');
+    document.getElementById('save-label').textContent='保存済み ✓';
+  },800);
+  render();
 }
-function s2t(s) {
-  s = Math.max(0, Math.round(s));
-  return Math.floor(s / 60) + ':' + (s % 60 < 10 ? '0' : '') + s % 60;
-}
-function total() { return items.reduce((a, it) => a + d2s(it.dur), 0); }
 
-// ===== FORM =====
-function openForm(mode) {
-  formMode = mode;
-  const form = document.getElementById('add-form');
-  const trigEl = document.getElementById('trig-' + mode);
-  if (form.classList.contains('open') && trigEl.classList.contains('active')) {
-    closeForm(); return;
-  }
-  document.querySelectorAll('.trig-btn').forEach(b => b.classList.remove('active'));
-  trigEl.classList.add('active');
-  const isSong = mode === 'song', isMC = mode === 'mc';
-  document.getElementById('form-title').textContent = isSong ? '🎵 曲を追加' : isMC ? '🎤 MCを追加' : '🔄 SE / 転換を追加';
-  document.getElementById('f-tempo').style.display = isSong ? '' : 'none';
-  document.getElementById('f-light').style.display = isSong ? '' : 'none';
-  document.getElementById('f-pa').style.display    = isSong ? '' : 'none';
-  document.getElementById('f-note').style.display  = isMC   ? '' : 'none';
-  document.getElementById('a-note').value = '';
-  document.getElementById('a-dur').value  = isSong ? '' : (isMC ? '2:00' : '0:30');
-  document.getElementById('a-name').value = '';
-  sc('a-tempo', '普通'); sc('a-light', 'おまかせ'); sc('a-pa', 'おまかせ');
+function commitSave(){
+  const data=getFormData();
+  const sessions=getSessions();
+  const idx=sessions.findIndex(s=>s.id===currentId);
+  if(idx>=0)sessions[idx]={...sessions[idx],...data};
+  else sessions.unshift(data);
+  saveSessions(sessions);
+  try{localStorage.setItem(CK,currentId);}catch(e){}
+  renderSaved();
+}
+
+function loadSession(id){
+  const s=getSessions().find(x=>x.id===id);
+  if(!s)return;
+  currentId=s.id;
+  document.getElementById('band-name').value=s.bandName||'';
+  document.getElementById('event-name').value=s.eventName||'';
+  document.getElementById('event-date').value=s.eventDate||'';
+  document.getElementById('event-venue').value=s.eventVenue||'';
+  document.getElementById('limit').value=s.limit||30;
+  items=s.items?JSON.parse(JSON.stringify(s.items)):[];
+  seq=s.seq||items.length+1;
+  document.getElementById('save-dot').classList.add('saved');
+  document.getElementById('save-label').textContent='保存済み ✓';
+  render();renderSaved();
+  showToast('データを読み込みました');
+}
+
+function newSession(){
+  if(items.length>0||document.getElementById('band-name').value) commitSave();
+  currentId='s'+Date.now();
+  items=[];seq=1;
+  document.getElementById('band-name').value='';
+  document.getElementById('event-name').value='SOUNDHOPE FEST.2026';
+  document.getElementById('event-date').value='2026-06-27';
+  document.getElementById('event-venue').value='Mizusawa Z Arena';
+  document.getElementById('limit').value=30;
+  document.getElementById('save-dot').classList.remove('saved');
+  document.getElementById('save-label').textContent='新規';
+  render();renderSaved();
+  showToast('新規セッションを作成しました');
+}
+
+function deleteSession(id,e){
+  e.stopPropagation();
+  if(!confirm('このデータを削除しますか？'))return;
+  let sessions=getSessions().filter(s=>s.id!==id);
+  saveSessions(sessions);
+  if(currentId===id)newSession();
+  else renderSaved();
+  showToast('削除しました');
+}
+
+function renderSaved(){
+  const sessions=getSessions();
+  const el=document.getElementById('saved-list');
+  if(!sessions.length){el.innerHTML='<div class="saved-empty">保存済みデータはありません</div>';return;}
+  el.innerHTML=sessions.map(s=>{
+    const isAct=s.id===currentId;
+    const dt=s.eventDate?s.eventDate.replace(/-/g,'/'):'';
+    const upd=new Date(s.updatedAt).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'});
+    const sent=s.sentAt?'✅ 送信済み':'';
+    return`<div class="saved-item${isAct?' active':''}" onclick="loadSession('${s.id}')">
+      <div style="flex:1;min-width:0">
+        <div class="saved-item-band">${s.bandName||'（バンド名未入力）'} <span style="color:var(--success);font-size:11px">${sent}</span></div>
+        <div class="saved-item-meta">${s.eventName||''}${dt?' '+dt:''} / ${s.items?.length||0}曲 / ${upd}</div>
+      </div>
+      <button class="btn-sm danger" onclick="deleteSession('${s.id}',event)">削除</button>
+    </div>`;
+  }).join('');
+}
+
+function openForm(mode){
+  formMode=mode;
+  const form=document.getElementById('add-form');
+  const trig=document.getElementById('trig-'+mode);
+  if(form.classList.contains('open')&&trig.classList.contains('active')){closeForm();return;}
+  document.querySelectorAll('.trig-btn').forEach(b=>b.classList.remove('active'));
+  trig.classList.add('active');
+  const isSong=mode==='song',isMC=mode==='mc';
+  document.getElementById('form-title').textContent=isSong?'🎵 曲を追加':isMC?'🎤 MCを追加':'🔄 SE/転換を追加';
+  document.getElementById('f-tempo').style.display=isSong?'':'none';
+  document.getElementById('f-light').style.display=isSong?'':'none';
+  document.getElementById('f-pa').style.display=isSong?'':'none';
+  document.getElementById('f-note').style.display=isMC?'':'none';
+  document.getElementById('a-note').value='';
+  document.getElementById('a-dur').value=isSong?'':(isMC?'2:00':'0:30');
+  document.getElementById('a-name').value='';
+  sc('a-tempo','普通');sc('a-light','おまかせ');sc('a-pa','おまかせ');
   form.classList.add('open');
-  setTimeout(() => document.getElementById('a-name').focus(), 100);
+  setTimeout(()=>document.getElementById('a-name').focus(),100);
 }
-function closeForm() {
+function closeForm(){
   document.getElementById('add-form').classList.remove('open');
-  document.querySelectorAll('.trig-btn').forEach(b => b.classList.remove('active'));
-  formMode = null;
+  document.querySelectorAll('.trig-btn').forEach(b=>b.classList.remove('active'));
+  formMode=null;
 }
-function doAdd() {
-  const name = document.getElementById('a-name').value.trim();
-  const dur  = document.getElementById('a-dur').value.trim();
-  if (formMode === 'song' && !name) { document.getElementById('a-name').focus(); return; }
-  items.push({
-    id: seq++, type: formMode,
-    name: name || (formMode === 'mc' ? 'MC' : '転換'), dur,
-    tempo: gv('a-tempo'), light: gv('a-light'), pa: gv('a-pa'),
-    note: document.getElementById('a-note').value.trim()
-  });
-  closeForm(); render();
-  showToast('追加しました ✓');
+function doAdd(){
+  const name=document.getElementById('a-name').value.trim();
+  const dur=document.getElementById('a-dur').value.trim();
+  if(formMode==='song'&&!name){document.getElementById('a-name').focus();return;}
+  items.push({id:seq++,type:formMode,name:name||(formMode==='mc'?'MC':'転換'),dur,tempo:gv('a-tempo'),light:gv('a-light'),pa:gv('a-pa'),note:document.getElementById('a-note').value.trim()});
+  closeForm();render();autoSave();showToast('追加しました ✓');
 }
 
-// ===== RENDER =====
-function render() {
-  const lim = (parseInt(document.getElementById('limit').value) || 30) * 60;
-  const tot = total(), songs = items.filter(i => i.type === 'song').length;
-  const left = lim - tot;
-  document.getElementById('s-total').textContent = s2t(tot);
-  document.getElementById('s-songs').textContent = songs + '曲';
-  const le = document.getElementById('s-left');
-  le.textContent = (left >= 0 ? '残り ' : '超過 ') + s2t(Math.abs(left));
-  le.className = 'sum-val' + (left < 0 ? ' warn' : ' ok');
-
-  const bar = document.getElementById('tl-bar');
-  bar.innerHTML = tot > 0 ? items.map(it => {
-    const w = Math.max(2, (d2s(it.dur) / tot) * 100);
-    return `<div class="tl-seg ${it.type !== 'song' ? 'tl-mc' : 'tl-song'}" style="flex:${w};height:100%;border-radius:2px"></div>`;
-  }).join('') : '';
-
-  let sn = 0;
-  const listEl = document.getElementById('sl-list');
-  if (!items.length) {
-    listEl.innerHTML = '<div class="sl-empty">まだ曲がありません<br>下の「曲を追加」ボタンから追加してください</div>';
-  } else {
-    listEl.innerHTML = items.map((it, idx) => {
-      const isMC = it.type !== 'song';
-      if (it.type === 'song') sn++;
-      const ndisp = it.type === 'song' ? sn : it.type === 'mc' ? 'MC' : 'SE';
-      const dur = it.dur ? s2t(d2s(it.dur)) : '―';
-      const tags = [];
-      if (it.tempo === '遅い') tags.push(`<span class="tag tag-slow">🐢 遅い</span>`);
-      if (it.tempo === '速い') tags.push(`<span class="tag tag-fast">🔥 速い</span>`);
-      if (it.light && it.light !== 'おまかせ') tags.push(`<span class="tag tag-light">💡 ${it.light}</span>`);
-      if (it.pa && it.pa !== 'おまかせ') tags.push(`<span class="tag tag-pa">🎚 ${it.pa}</span>`);
-      if (it.note) tags.push(`<span class="tag">📝 ${it.note}</span>`);
-      return `<div class="sl-item${isMC ? ' mc-item' : ''}" id="si-${it.id}"
-        draggable="true"
-        ondragstart="ds(event,${idx})" ondragover="dov(event,${idx})"
-        ondrop="dp(event,${idx})" ondragend="de()"
-        ontouchstart="ts(event,${idx})" ontouchmove="tm(event)" ontouchend="te(event,${idx})">
-        <span class="drag-handle">⠿</span>
-        <span class="item-num">${ndisp}</span>
-        <div class="item-body">
-          <div class="item-name${isMC ? ' mc-name' : ''}">${it.name}</div>
-          <div class="item-meta"><span class="item-dur">${dur}</span>${tags.join('')}</div>
-        </div>
+function render(){
+  const lim=(parseInt(document.getElementById('limit').value)||30)*60;
+  const tot=total(),songs=items.filter(i=>i.type==='song').length,left=lim-tot;
+  document.getElementById('s-total').textContent=s2t(tot);
+  document.getElementById('s-songs').textContent=songs+'曲';
+  const le=document.getElementById('s-left');
+  le.textContent=(left>=0?'残り ':'超過 ')+s2t(Math.abs(left));
+  le.className='sum-val'+(left<0?' warn':' ok');
+  const bar=document.getElementById('tl-bar');
+  bar.innerHTML=tot>0?items.map(it=>{const w=Math.max(2,(d2s(it.dur)/tot)*100);return`<div class="tl-seg ${it.type!=='song'?'tl-mc':'tl-song'}" style="flex:${w};height:100%;border-radius:2px"></div>`;}).join(''):'';
+  let sn=0;
+  const listEl=document.getElementById('sl-list');
+  if(!items.length){listEl.innerHTML='<div class="sl-empty">まだ曲がありません<br>下の「曲を追加」ボタンから追加してください</div>';}
+  else{
+    listEl.innerHTML=items.map((it,idx)=>{
+      const isMC=it.type!=='song';
+      if(it.type==='song')sn++;
+      const ndisp=it.type==='song'?sn:it.type==='mc'?'MC':'SE';
+      const dur=it.dur?s2t(d2s(it.dur)):'―';
+      const tags=[];
+      if(it.tempo==='遅い')tags.push(`<span class="tag tag-slow">🐢 遅い</span>`);
+      if(it.tempo==='速い')tags.push(`<span class="tag tag-fast">🔥 速い</span>`);
+      if(it.light&&it.light!=='おまかせ')tags.push(`<span class="tag tag-light">💡 ${it.light}</span>`);
+      if(it.pa&&it.pa!=='おまかせ')tags.push(`<span class="tag tag-pa">🎚 ${it.pa}</span>`);
+      if(it.note)tags.push(`<span class="tag">📝 ${it.note}</span>`);
+      return`<div class="sl-item${isMC?' mc-item':''}" id="si-${it.id}" draggable="true" ondragstart="ds(event,${idx})" ondragover="dov(event,${idx})" ondrop="dp(event,${idx})" ondragend="de()" ontouchstart="ts(event,${idx})" ontouchmove="tm(event)" ontouchend="te(event,${idx})">
+        <span class="drag-handle">⠿</span><span class="item-num">${ndisp}</span>
+        <div class="item-body"><div class="item-name${isMC?' mc-name':''}">${it.name}</div>
+        <div class="item-meta"><span class="item-dur">${dur}</span>${tags.join('')}</div></div>
         <div class="item-actions">
           <button class="act-btn" onclick="openP(${it.id})">編集</button>
           <button class="act-btn del" onclick="delById(${it.id})">✕</button>
@@ -513,168 +488,111 @@ function render() {
       </div>`;
     }).join('');
   }
-
-  document.getElementById('send-btn').disabled = items.length === 0;
+  document.getElementById('send-btn').disabled=items.length===0;
   renderOut();
 }
 
-// ===== SEND =====
-async function sendToSheets() {
-  const bandName = document.getElementById('band-name').value.trim();
-  if (!bandName) { showToast('バンド名を入力してください'); return; }
-  if (!items.length) return;
-  const btn = document.getElementById('send-btn');
-  const lbl = document.getElementById('send-lbl');
-  const res = document.getElementById('send-result');
-  btn.disabled = true; lbl.textContent = '送信中...'; res.style.display = 'none';
-  const payload = {
+async function sendToSheets(){
+  const bandName=document.getElementById('band-name').value.trim();
+  if(!bandName){showToast('バンド名を入力してください');return;}
+  if(!items.length)return;
+  const btn=document.getElementById('send-btn'),lbl=document.getElementById('send-lbl'),res=document.getElementById('send-result');
+  btn.disabled=true;lbl.textContent='送信中...';res.style.display='none';
+  const payload={
     bandName,
-    items: items.map((it, i) => ({
-      order: i + 1, type: it.type, name: it.name, dur: it.dur || '',
-      tempo: it.tempo || '', light: it.light || '', pa: it.pa || '', note: it.note || ''
-    }))
+    eventName:document.getElementById('event-name').value,
+    eventDate:document.getElementById('event-date').value,
+    eventVenue:document.getElementById('event-venue').value,
+    items:items.map((it,i)=>({order:i+1,type:it.type,name:it.name,dur:it.dur||'',tempo:it.tempo||'',light:it.light||'',pa:it.pa||'',note:it.note||''}))
   };
-  try {
-    await fetch(GAS_URL, {
-      method: 'POST', mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload)
-    });
-    res.className = 'send-result send-ok';
-    res.textContent = '✅ 送信しました！スプレッドシートの「jinku」シートを確認してください';
-    res.style.display = 'block';
-    lbl.textContent = 'スプレッドシートに送信';
-    playPop(true); vib(true);
-  } catch(e) {
-    res.className = 'send-result send-err';
-    res.textContent = '❌ 送信に失敗しました。通信環境を確認してください';
-    res.style.display = 'block';
-    lbl.textContent = 'スプレッドシートに送信';
+  try{
+    await fetch(GAS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    res.className='send-result send-ok';
+    res.textContent='✅ 送信しました！データはこの端末にも保存されています。再訪問時も確認・再送信できます。';
+    res.style.display='block';
+    lbl.textContent='再送信する';
+    const sessions=getSessions();
+    const idx=sessions.findIndex(s=>s.id===currentId);
+    if(idx>=0){sessions[idx].sentAt=new Date().toISOString();saveSessions(sessions);renderSaved();}
+    playPop(true);vib(true);
+  }catch(e){
+    res.className='send-result send-err';
+    res.textContent='❌ 送信に失敗しました。データは端末に保存されています。';
+    res.style.display='block';
+    lbl.textContent='スプレッドシートに送信';
   }
-  btn.disabled = false;
+  btn.disabled=false;
 }
 
-// ===== OUTPUT =====
-function toggleOutput() {
-  document.getElementById('out-txt').classList.toggle('open');
-}
-function renderOut() {
-  const lim = parseInt(document.getElementById('limit').value) || 30;
-  const band = document.getElementById('band-name').value || 'バンド名未設定';
-  const lines = [
-    `【セットリスト】${band}`,
-    `持ち時間：${lim}分　総時間：${s2t(total())}`,
-    '─'.repeat(32)
-  ];
-  let sn = 0;
-  items.forEach(it => {
-    const dur = d2s(it.dur);
-    if (it.type === 'song') {
-      sn++;
-      const te = it.tempo === '遅い' ? '🐢' : it.tempo === '速い' ? '🔥' : '';
-      let l = `${String(sn).padStart(2,' ')}. ${it.name}`;
-      if (it.dur) l += `　${s2t(dur)}`; if (te) l += `　${te}`;
-      lines.push(l);
-      if (it.light && it.light !== 'おまかせ') lines.push(`　　💡 ${it.light}`);
-      if (it.pa    && it.pa    !== 'おまかせ') lines.push(`　　🎚 ${it.pa}`);
-      if (it.note) lines.push(`　　📝 ${it.note}`);
-    } else if (it.type === 'mc') {
-      lines.push(`  ── MC ${it.dur ? s2t(dur) : ''}　${it.name !== 'MC' ? it.name : ''}`);
-    } else {
-      lines.push(`  ── 転換 ${it.dur ? s2t(dur) : ''}　${it.name !== '転換' ? it.name : ''}`);
-    }
+function toggleOutput(){document.getElementById('out-txt').classList.toggle('open');}
+function renderOut(){
+  const lim=parseInt(document.getElementById('limit').value)||30;
+  const band=document.getElementById('band-name').value||'バンド名未設定';
+  const ev=document.getElementById('event-name').value;
+  const dt=document.getElementById('event-date').value;
+  const ve=document.getElementById('event-venue').value;
+  const lines=[];
+  if(ev)lines.push(`【${ev}】`);
+  if(dt||ve)lines.push(`${dt?dt.replace(/-/g,'/'):''}　${ve||''}`);
+  lines.push(`【セットリスト】${band}`);
+  lines.push(`持ち時間：${lim}分　総時間：${s2t(total())}`);
+  lines.push('─'.repeat(32));
+  let sn=0;
+  items.forEach(it=>{
+    const dur=d2s(it.dur);
+    if(it.type==='song'){sn++;const te=it.tempo==='遅い'?'🐢':it.tempo==='速い'?'🔥':'';let l=`${String(sn).padStart(2,' ')}. ${it.name}`;if(it.dur)l+=`　${s2t(dur)}`;if(te)l+=`　${te}`;lines.push(l);if(it.light&&it.light!=='おまかせ')lines.push(`　　💡 ${it.light}`);if(it.pa&&it.pa!=='おまかせ')lines.push(`　　🎚 ${it.pa}`);if(it.note)lines.push(`　　📝 ${it.note}`);}
+    else if(it.type==='mc')lines.push(`  ── MC ${it.dur?s2t(dur):''}　${it.name!=='MC'?it.name:''}`);
+    else lines.push(`  ── 転換 ${it.dur?s2t(dur):''}　${it.name!=='転換'?it.name:''}`);
   });
   lines.push('─'.repeat(32));
   lines.push(`合計 ${s2t(total())} / ${lim}:00`);
-  document.getElementById('out-txt').textContent = lines.join('\n');
+  document.getElementById('out-txt').textContent=lines.join('\n');
 }
-function copyOut() {
-  const t = document.getElementById('out-txt').textContent;
-  navigator.clipboard?.writeText(t)
-    .then(() => showToast('コピーしました！'))
-    .catch(() => alert(t));
-}
+function copyOut(){const t=document.getElementById('out-txt').textContent;navigator.clipboard?.writeText(t).then(()=>showToast('コピーしました！')).catch(()=>alert(t));}
 
-// ===== POPUP =====
-function openP(id) {
-  editId = id;
-  const it = items.find(i => i.id === id); if (!it) return;
-  document.getElementById('pop-ttl').textContent = it.type === 'song' ? '曲を編集' : it.type === 'mc' ? 'MCを編集' : 'SE/転換を編集';
-  document.getElementById('pe-name').value = it.name;
-  document.getElementById('pe-dur').value  = it.dur || '';
-  document.getElementById('pe-note').value = it.note || '';
-  sc('pe-tempo', it.tempo || '普通');
-  sc('pe-light', it.light || 'おまかせ');
-  sc('pe-pa',    it.pa    || 'おまかせ');
-  document.getElementById('pe-song-opts').style.display = it.type === 'song' ? '' : 'none';
+function openP(id){
+  editId=id;const it=items.find(i=>i.id===id);if(!it)return;
+  document.getElementById('pop-ttl').textContent=it.type==='song'?'曲を編集':it.type==='mc'?'MCを編集':'SE/転換を編集';
+  document.getElementById('pe-name').value=it.name;
+  document.getElementById('pe-dur').value=it.dur||'';
+  document.getElementById('pe-note').value=it.note||'';
+  sc('pe-tempo',it.tempo||'普通');sc('pe-light',it.light||'おまかせ');sc('pe-pa',it.pa||'おまかせ');
+  document.getElementById('pe-song-opts').style.display=it.type==='song'?'':'none';
   document.getElementById('pov').classList.add('open');
 }
-function closeP() { document.getElementById('pov').classList.remove('open'); editId = null; }
-function saveItem() {
-  const it = items.find(i => i.id === editId); if (!it) return;
-  it.name  = document.getElementById('pe-name').value || it.name;
-  it.dur   = document.getElementById('pe-dur').value;
-  it.note  = document.getElementById('pe-note').value;
-  it.tempo = gv('pe-tempo');
-  if (it.type === 'song') { it.light = gv('pe-light'); it.pa = gv('pe-pa'); }
-  closeP(); render(); showToast('保存しました ✓');
-}
-function delItem() {
-  items = items.filter(i => i.id !== editId);
-  closeP(); render();
-}
-function delById(id) { items = items.filter(i => i.id !== id); render(); }
-document.getElementById('pov').addEventListener('click', e => { if (e.target.id === 'pov') closeP(); });
+function closeP(){document.getElementById('pov').classList.remove('open');editId=null;}
+function saveItem(){const it=items.find(i=>i.id===editId);if(!it)return;it.name=document.getElementById('pe-name').value||it.name;it.dur=document.getElementById('pe-dur').value;it.note=document.getElementById('pe-note').value;it.tempo=gv('pe-tempo');if(it.type==='song'){it.light=gv('pe-light');it.pa=gv('pe-pa');}closeP();render();autoSave();showToast('保存しました ✓');}
+function delItem(){items=items.filter(i=>i.id!==editId);closeP();render();autoSave();}
+function delById(id){items=items.filter(i=>i.id!==id);render();autoSave();}
+document.getElementById('pov').addEventListener('click',e=>{if(e.target.id==='pov')closeP();});
 
-// ===== DRAG =====
-function ds(e, i) { dragSrc = i; }
-function dov(e, i) {
-  e.preventDefault();
-  document.querySelectorAll('.sl-item').forEach(el => el.classList.remove('over'));
-  const el = document.getElementById('si-' + items[i]?.id);
-  if (el) el.classList.add('over');
-  dragOver = i;
-}
-function dp(e, i) {
-  e.preventDefault();
-  if (dragSrc !== null && dragSrc !== i) {
-    const t = items.splice(dragSrc, 1)[0]; items.splice(i, 0, t);
-  }
-  document.querySelectorAll('.sl-item').forEach(el => el.classList.remove('over'));
-  dragSrc = null; dragOver = null; render();
-}
-function de() { document.querySelectorAll('.sl-item').forEach(el => el.classList.remove('over')); dragSrc = null; }
-function ts(e, i) { if (e.target.classList.contains('act-btn')) return; touchSrc = i; dragOver = null; }
-function tm(e) {
-  if (touchSrc === null) return; e.preventDefault();
-  const cy = e.touches[0].clientY;
-  document.querySelectorAll('.sl-item').forEach((el, i) => {
-    el.classList.remove('over');
-    const r = el.getBoundingClientRect();
-    if (cy >= r.top && cy <= r.bottom) { el.classList.add('over'); dragOver = i; }
-  });
-}
-function te(e, i) {
-  document.querySelectorAll('.sl-item').forEach(el => el.classList.remove('over'));
-  if (touchSrc !== null && dragOver !== null && touchSrc !== dragOver) {
-    const t = items.splice(touchSrc, 1)[0]; items.splice(dragOver, 0, t); render();
-  }
-  touchSrc = null; dragOver = null;
-}
+function ds(e,i){dragSrc=i;}
+function dov(e,i){e.preventDefault();document.querySelectorAll('.sl-item').forEach(el=>el.classList.remove('over'));const el=document.getElementById('si-'+items[i]?.id);if(el)el.classList.add('over');dragOver=i;}
+function dp(e,i){e.preventDefault();if(dragSrc!==null&&dragSrc!==i){const t=items.splice(dragSrc,1)[0];items.splice(i,0,t);}document.querySelectorAll('.sl-item').forEach(el=>el.classList.remove('over'));dragSrc=null;dragOver=null;render();autoSave();}
+function de(){document.querySelectorAll('.sl-item').forEach(el=>el.classList.remove('over'));dragSrc=null;}
+function ts(e,i){if(e.target.classList.contains('act-btn'))return;touchSrc=i;dragOver=null;}
+function tm(e){if(touchSrc===null)return;e.preventDefault();const cy=e.touches[0].clientY;document.querySelectorAll('.sl-item').forEach((el,i)=>{el.classList.remove('over');const r=el.getBoundingClientRect();if(cy>=r.top&&cy<=r.bottom){el.classList.add('over');dragOver=i;}});}
+function te(e,i){document.querySelectorAll('.sl-item').forEach(el=>el.classList.remove('over'));if(touchSrc!==null&&dragOver!==null&&touchSrc!==dragOver){const t=items.splice(touchSrc,1)[0];items.splice(dragOver,0,t);render();autoSave();}touchSrc=null;dragOver=null;}
 
-// ===== TOAST =====
-function showToast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 2200);
-}
+function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);}
+document.addEventListener('keydown',e=>{if(e.key==='Enter'&&formMode&&document.activeElement.closest('.add-form'))doAdd();});
 
-// ===== KEYBOARD =====
-document.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && formMode && document.activeElement.closest('.add-form')) doAdd();
-});
-
-render();
+// INIT
+(function(){
+  try{
+    const lastId=localStorage.getItem(CK);
+    const sessions=getSessions();
+    if(lastId&&sessions.find(s=>s.id===lastId)){loadSession(lastId);}
+    else if(sessions.length>0){loadSession(sessions[0].id);}
+    else{
+      currentId='s'+Date.now();
+      document.getElementById('event-name').value='SOUNDHOPE FEST.2026';
+      document.getElementById('event-date').value='2026-06-27';
+      document.getElementById('event-venue').value='Mizusawa Z Arena';
+      render();renderSaved();
+    }
+  }catch(e){currentId='s'+Date.now();render();renderSaved();}
+})();
 </script>
 </body>
 </html>
