@@ -77,6 +77,10 @@ nav{background:#0a0a0a;border-bottom:1px solid var(--border);padding:11px 16px;p
 .pa-pa{background:#1a2a3a;color:#74b9ff;border:1px solid #2a4060}
 .pa-note{background:var(--surface3);color:var(--muted);border:1px solid var(--border)}
 .pa-sheet-summary{padding:10px 14px;background:var(--surface3);border-top:1px solid var(--border);font-size:12px;color:var(--muted);display:flex;gap:16px}
+/* LONG PRESS */
+@keyframes longpress-fill{from{width:0%}to{width:100%}}
+.long-press-active{border-color:var(--acc)!important;background:#ff6b1a18!important;transform:scale(1.02);transition:transform .1s;}
+.sl-item{transition:transform .1s,border-color .15s,background .15s;}
 /* EDIT MODE */
 .edit-mode-btn{padding:6px 14px;border-radius:20px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);cursor:pointer;font-size:12px;font-weight:500;font-family:'Noto Sans JP',sans-serif;transition:.2s;display:flex;align-items:center;gap:5px}
 .edit-mode-btn.on{background:var(--acc);color:#000;border-color:var(--acc)}
@@ -770,14 +774,51 @@ function delItem(){items=items.filter(i=>i.id!==editId);closeP();render();autoSa
 function delById(id){items=items.filter(i=>i.id!==id);render();autoSave();}
 document.getElementById('pov').addEventListener('click',e=>{if(e.target.id==='pov')closeP();});
 
-// ===== DRAG =====
+// ===== DRAG (長押し1秒でドラッグ開始) =====
+let longPressTimer=null, longPressActive=false;
+
 function ds(e,i){if(!editMode)return;dragSrc=i;}
 function dov(e,i){e.preventDefault();document.querySelectorAll('.sl-item').forEach(el=>el.classList.remove('over'));const el=document.getElementById('si-'+items[i]?.id);if(el)el.classList.add('over');dragOver=i;}
 function dp(e,i){e.preventDefault();if(dragSrc!==null&&dragSrc!==i){const t=items.splice(dragSrc,1)[0];items.splice(i,0,t);}document.querySelectorAll('.sl-item').forEach(el=>el.classList.remove('over'));dragSrc=null;dragOver=null;render();autoSave();}
 function de(){document.querySelectorAll('.sl-item').forEach(el=>el.classList.remove('over'));dragSrc=null;}
-function ts(e,i){if(!editMode||e.target.classList.contains('act-btn'))return;touchSrc=i;dragOver=null;}
-function tm(e){if(touchSrc===null)return;e.preventDefault();const cy=e.touches[0].clientY;document.querySelectorAll('.sl-item').forEach((el,i)=>{el.classList.remove('over');const r=el.getBoundingClientRect();if(cy>=r.top&&cy<=r.bottom){el.classList.add('over');dragOver=i;}});}
-function te(e,i){document.querySelectorAll('.sl-item').forEach(el=>el.classList.remove('over'));if(touchSrc!==null&&dragOver!==null&&touchSrc!==dragOver){const t=items.splice(touchSrc,1)[0];items.splice(dragOver,0,t);render();autoSave();}touchSrc=null;dragOver=null;}
+
+function ts(e,i){
+  if(!editMode||e.target.classList.contains('act-btn'))return;
+  longPressActive=false;
+  touchSrc=null;
+  dragOver=null;
+  const el=e.currentTarget;
+  longPressTimer=setTimeout(()=>{
+    longPressActive=true;
+    touchSrc=i;
+    el.classList.add('long-press-active');
+    // バイブ
+    try{navigator.vibrate&&navigator.vibrate([30,20,30]);}catch(e2){}
+  },1000);
+}
+function tm(e){
+  if(!longPressActive||touchSrc===null){
+    // 長押し前に動いたらキャンセル
+    clearTimeout(longPressTimer);
+    return;
+  }
+  e.preventDefault();
+  const cy=e.touches[0].clientY;
+  document.querySelectorAll('.sl-item').forEach((el,i)=>{
+    el.classList.remove('over');
+    const r=el.getBoundingClientRect();
+    if(cy>=r.top&&cy<=r.bottom&&i!==touchSrc){el.classList.add('over');dragOver=i;}
+  });
+}
+function te(e,i){
+  clearTimeout(longPressTimer);
+  document.querySelectorAll('.sl-item').forEach(el=>{el.classList.remove('over');el.classList.remove('long-press-active');});
+  if(longPressActive&&touchSrc!==null&&dragOver!==null&&touchSrc!==dragOver){
+    const t=items.splice(touchSrc,1)[0];items.splice(dragOver,0,t);render();autoSave();
+    showToast('順番を変更しました');
+  }
+  touchSrc=null;dragOver=null;longPressActive=false;
+}
 
 // ===== TOAST =====
 function showToast(msg){const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');setTimeout(()=>el.classList.remove('show'),2200);}
