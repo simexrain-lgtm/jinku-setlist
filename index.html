@@ -107,6 +107,19 @@ nav{background:#0a0a0a;border-bottom:1px solid var(--border);padding:11px 16px;p
 .sl-item.dragging-src{opacity:.35;transform:scale(.97)}
 @keyframes insert-pop{0%{transform:scaleY(0);opacity:0}60%{transform:scaleY(1.08)}100%{transform:scaleY(1);opacity:1}}
 .sl-item.just-inserted{animation:insert-pop .25s ease-out}
+/* DRAG GHOST */
+#drag-ghost{
+  position:fixed;z-index:999;pointer-events:none;
+  background:var(--surface);border:2px solid var(--acc);
+  border-radius:10px;padding:10px 14px;
+  box-shadow:0 8px 32px rgba(255,107,26,.45);
+  opacity:.92;transform:scale(1.04) rotate(-1.5deg);
+  transition:opacity .1s;
+  max-width:80vw;min-width:160px;
+  display:none;
+}
+#drag-ghost .ghost-num{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--acc);margin-right:8px}
+#drag-ghost .ghost-name{font-size:18px;font-weight:700;color:var(--text)}
 /* LONG PRESS */
 @keyframes longpress-fill{from{width:0%}to{width:100%}}
 .long-press-active{border-color:var(--acc)!important;background:#ff6b1a18!important;transform:scale(1.02);transition:transform .1s;}
@@ -455,6 +468,7 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5)}
 </div>
 
 <div class="toast" id="toast"></div>
+<div id="drag-ghost"><span class="ghost-num" id="ghost-num"></span><span class="ghost-name" id="ghost-name"></span></div>
 
 <script>
 const GAS_URL='https://script.google.com/macros/s/AKfycbzmY7_MHDnBdea_WuRuR48V0adMa4JTbWZ-ULtGvMvQ8dieVLRoBguyHA-X52YWzTK4/exec';
@@ -868,111 +882,123 @@ function delItem(){items=items.filter(i=>i.id!==editId);closeP();render();autoSa
 function delById(id){items=items.filter(i=>i.id!==id);render();autoSave();}
 document.getElementById('pov').addEventListener('click',e=>{if(e.target.id==='pov')closeP();});
 
-// ===== DRAG (長押し1秒 + 挿入アニメーション) =====
+// ===== DRAG (長押し1秒 + ゴースト影 + 挿入アニメーション) =====
 let longPressTimer=null, longPressActive=false, insertIdx=null;
+let touchStartX=0, touchStartY=0, touchMoved=false;
 
-// マウス用（PC）
+// ---- ゴースト表示 ----
+function showGhost(idx, cx, cy){
+  const it=items[idx]; if(!it)return;
+  let sn=0; for(let k=0;k<=idx;k++) if(items[k].type==='song') sn++;
+  document.getElementById('ghost-num').textContent=it.type==='song'?sn+'.':'MC';
+  document.getElementById('ghost-name').textContent=it.name;
+  const g=document.getElementById('drag-ghost');
+  g.style.display='block'; g.style.opacity='';
+  moveGhost(cx,cy);
+}
+function moveGhost(cx,cy){
+  const g=document.getElementById('drag-ghost');
+  const gw=Math.max(g.offsetWidth,160);
+  const gh=g.offsetHeight||56;
+  g.style.left=Math.max(4,Math.min(window.innerWidth-gw-4,cx-gw/2))+'px';
+  g.style.top=Math.max(4,cy-gh-20)+'px';
+}
+function hideGhost(){
+  const g=document.getElementById('drag-ghost');
+  g.style.opacity='0';
+  setTimeout(()=>{g.style.display='none';g.style.opacity='';},150);
+}
+
+// ---- マウス用（PC）----
 function ds(e,i){if(!editMode)return;dragSrc=i;e.currentTarget.classList.add('dragging-src');}
 function dov(e,i){
   e.preventDefault();
   if(dragSrc===null||i===dragSrc)return;
   const el=document.getElementById('si-'+items[i]?.id);
   const r=el.getBoundingClientRect();
-  const mid=r.top+r.height/2;
-  const cy=e.clientY;
-  document.querySelectorAll('.sl-item').forEach(x=>{x.classList.remove('insert-above','insert-below');});
-  document.querySelectorAll('.insert-indicator').forEach(x=>x.classList.remove('show'));
-  if(cy<mid){
-    el.classList.add('insert-above');
-    insertIdx=i; // ここの前に挿入
-  } else {
-    el.classList.add('insert-below');
-    insertIdx=i+1; // ここの後に挿入
-  }
+  document.querySelectorAll('.sl-item').forEach(x=>x.classList.remove('insert-above','insert-below'));
+  if(e.clientY<r.top+r.height/2){el.classList.add('insert-above');insertIdx=i;}
+  else{el.classList.add('insert-below');insertIdx=i+1;}
   dragOver=i;
 }
 function dp(e,i){
   e.preventDefault();
-  document.querySelectorAll('.sl-item').forEach(x=>{x.classList.remove('insert-above','insert-below','dragging-src');});
+  document.querySelectorAll('.sl-item').forEach(x=>x.classList.remove('insert-above','insert-below','dragging-src'));
   if(dragSrc!==null&&insertIdx!==null&&insertIdx!==dragSrc&&insertIdx!==dragSrc+1){
     const moved=items.splice(dragSrc,1)[0];
-    const realIdx=insertIdx>dragSrc?insertIdx-1:insertIdx;
-    items.splice(realIdx,0,moved);
-    render();autoSave();
-    // 挿入アニメーション
-    setTimeout(()=>{
-      const newEl=document.getElementById('si-'+moved.id);
-      if(newEl)newEl.classList.add('just-inserted');
-    },10);
-    showToast('順番を変更しました ✓');
+    const ri=insertIdx>dragSrc?insertIdx-1:insertIdx;
+    items.splice(ri,0,moved); render(); autoSave();
+    setTimeout(()=>{const el=document.getElementById('si-'+moved.id);if(el)el.classList.add('just-inserted');},10);
+    showToast('✓ 順番を変更しました');
   }
   dragSrc=null;dragOver=null;insertIdx=null;
 }
 function de(){
-  document.querySelectorAll('.sl-item').forEach(x=>{x.classList.remove('insert-above','insert-below','dragging-src');});
+  document.querySelectorAll('.sl-item').forEach(x=>x.classList.remove('insert-above','insert-below','dragging-src'));
   dragSrc=null;insertIdx=null;
 }
 
-// タッチ用（スマホ）
+// ---- タッチ用（スマホ）----
 function ts(e,i){
-  // 閲覧モードは何もしない（スクロール通す）
+  // 閲覧モードまたはact-btn → 完全スルー（スクロール自由）
   if(!editMode||e.target.classList.contains('act-btn'))return;
-  longPressActive=false;touchSrc=null;dragOver=null;insertIdx=null;
-  const startY=e.touches[0].clientY;
-  const el=e.currentTarget;
-  // タッチ開始座標を記録（指が動いたらキャンセル）
-  el._touchStartY=startY;
+  longPressActive=false;touchSrc=null;dragOver=null;insertIdx=null;touchMoved=false;
+  touchStartX=e.touches[0].clientX;
+  touchStartY=e.touches[0].clientY;
   longPressTimer=setTimeout(()=>{
-    longPressActive=true;
-    touchSrc=i;
-    el.classList.add('long-press-active');
-    try{navigator.vibrate&&navigator.vibrate([30,20,30]);}catch(e2){}
+    if(touchMoved)return;
+    longPressActive=true; touchSrc=i;
+    const el=document.getElementById('si-'+items[i]?.id);
+    if(el)el.classList.add('long-press-active','dragging-src');
+    showGhost(i, touchStartX, touchStartY);
+    try{navigator.vibrate&&navigator.vibrate([40,30,40]);}catch(e2){}
     showToast('そのままスライドして移動');
   },1000);
 }
+
 function tm(e){
-  // 長押し前 → 指が少し動いたらタイマーキャンセル（スクロールを妨げない）
-  if(!longPressActive){
-    const el=e.currentTarget||e.target.closest('.sl-item');
-    if(el&&el._touchStartY!==undefined){
-      const dy=Math.abs(e.touches[0].clientY - el._touchStartY);
-      if(dy>8) clearTimeout(longPressTimer);
-    }
-    return; // preventDefault しない → スクロール有効
-  }
-  // 長押し確定後だけスクロールを止めてドラッグ
-  if(touchSrc===null)return;
-  e.preventDefault();
+  const cx=e.touches[0].clientX;
   const cy=e.touches[0].clientY;
-  document.querySelectorAll('.sl-item').forEach((el,i)=>{
+
+  if(!longPressActive){
+    // 長押し前：6px以上動いたらキャンセル → スクロール通す
+    if(Math.abs(cx-touchStartX)>6||Math.abs(cy-touchStartY)>6){
+      touchMoved=true;
+      clearTimeout(longPressTimer);
+    }
+    return; // preventDefault しない → スクロール自由
+  }
+
+  // 長押し確定後のドラッグ処理
+  e.preventDefault();
+  moveGhost(cx, cy);
+
+  document.querySelectorAll('.sl-item').forEach((el,idx)=>{
     el.classList.remove('insert-above','insert-below');
-    if(i===touchSrc)return;
+    if(idx===touchSrc)return;
     const r=el.getBoundingClientRect();
-    if(cy>=r.top&&cy<=r.bottom){
-      const mid=r.top+r.height/2;
-      if(cy<mid){el.classList.add('insert-above');insertIdx=i;}
-      else{el.classList.add('insert-below');insertIdx=i+1;}
-      dragOver=i;
+    if(cy>=r.top-6&&cy<=r.bottom+6){
+      if(cy<r.top+r.height/2){el.classList.add('insert-above');insertIdx=idx;}
+      else{el.classList.add('insert-below');insertIdx=idx+1;}
+      dragOver=idx;
     }
   });
 }
+
 function te(e,i){
   clearTimeout(longPressTimer);
-  document.querySelectorAll('.sl-item').forEach(el=>{
-    el.classList.remove('insert-above','insert-below','long-press-active');
-  });
+  hideGhost();
+  document.querySelectorAll('.sl-item').forEach(el=>
+    el.classList.remove('insert-above','insert-below','long-press-active','dragging-src')
+  );
   if(longPressActive&&touchSrc!==null&&insertIdx!==null&&insertIdx!==touchSrc&&insertIdx!==touchSrc+1){
     const moved=items.splice(touchSrc,1)[0];
-    const realIdx=insertIdx>touchSrc?insertIdx-1:insertIdx;
-    items.splice(realIdx,0,moved);
-    render();autoSave();
-    setTimeout(()=>{
-      const newEl=document.getElementById('si-'+moved.id);
-      if(newEl)newEl.classList.add('just-inserted');
-    },10);
-    showToast('順番を変更しました ✓');
+    const ri=insertIdx>touchSrc?insertIdx-1:insertIdx;
+    items.splice(ri,0,moved); render(); autoSave();
+    setTimeout(()=>{const el=document.getElementById('si-'+moved.id);if(el)el.classList.add('just-inserted');},10);
+    showToast('✓ 順番を変更しました');
   }
-  touchSrc=null;dragOver=null;insertIdx=null;longPressActive=false;
+  touchSrc=null;dragOver=null;insertIdx=null;longPressActive=false;touchMoved=false;
 }
 
 // ===== TOAST =====
@@ -1079,9 +1105,34 @@ function updateNextBand(){
     const diff=timeToMin(next.time)-nowMin;
     nt.textContent=next.time+'〜　あと'+Math.round(diff)+'分';
   } else {
-    nl.textContent='本日の公演';
-    nb.textContent='終了しました';
-    nt.textContent='お疲れ様でした！';
+    // 公演日との比較
+    const now2=new Date();
+    const eventDate=new Date('2026-05-03');
+    const todayStr=now2.getFullYear()+'-'+String(now2.getMonth()+1).padStart(2,'0')+'-'+String(now2.getDate()).padStart(2,'0');
+    const eventStr='2026-05-03';
+    const diffMs=eventDate-new Date(todayStr);
+    const diffDays=Math.round(diffMs/(1000*60*60*24));
+    if(diffDays>1){
+      nl.textContent='本番まで';
+      nb.textContent='あと'+diffDays+'日！';
+      nt.textContent='5月3日（日）おまつり広場ステージ';
+      nb.style.color='var(--acc)';
+    } else if(diffDays===1){
+      nl.textContent='🔥 いよいよ明日！';
+      nb.textContent='江刺甚句まつり';
+      nt.textContent='5月3日（日）本番！';
+      nb.style.color='var(--acc)';
+    } else if(diffDays===0&&nowMin>timeToMin('12:30')){
+      nl.textContent='🎉 お疲れ様でした！';
+      nb.textContent='全バンド終演';
+      nt.textContent='最高のステージでした！';
+      nb.style.color='var(--success)';
+    } else {
+      nl.textContent='本日の公演';
+      nb.textContent='終了しました';
+      nt.textContent='お疲れ様でした！';
+      nb.style.color='var(--muted)';
+    }
   }
 }
 
