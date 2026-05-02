@@ -34,6 +34,16 @@ nav{background:#0a0a0a;border-bottom:1px solid var(--border);padding:10px 14px;p
 .members-title{font-size:10px;color:var(--acc);font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
 .mrow{display:grid;grid-template-columns:110px 1fr;gap:6px;margin-bottom:5px;font-size:12px}
 .mpart{color:var(--muted)}.mname{color:var(--text);font-weight:500}
+/* サイドメンバーリスト */
+.stage-area{display:flex;gap:8px;align-items:flex-start}
+.side-members{width:68px;flex-shrink:0;display:flex;flex-direction:column;gap:4px;padding-top:4px}
+.side-member{display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;border-radius:8px;background:var(--surface);border:1px solid var(--border);cursor:default;transition:.15s;position:relative}
+.side-member.center-pos{background:#2a1800;border-color:#ff6b1a;box-shadow:0 0 8px rgba(255,107,26,.25)}
+.side-member.center-pos::after{content:'CENTER';position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);font-size:7px;color:var(--acc);font-weight:700;letter-spacing:.05em;white-space:nowrap}
+.side-icon{font-size:20px;line-height:1}
+.side-name{font-size:8px;color:var(--muted);text-align:center;line-height:1.3;word-break:break-all}
+.side-part{font-size:7px;color:var(--acc);font-weight:700;text-align:center;margin-top:1px}
+.sw{flex:1;min-width:0}
 .pov{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:500;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:.2s}
 .pov.open{opacity:1;pointer-events:all}
 .pop{background:var(--surface);border-radius:16px 16px 0 0;width:100%;max-width:500px;padding:18px 14px 32px;transform:translateY(40px);transition:.25s;border-top:1px solid var(--border);max-height:85vh;overflow-y:auto}
@@ -106,8 +116,13 @@ body.edit-active #cv{cursor:grab}
     <button class="tb" onclick="expTxt()">📋 テキスト出力</button>
     <span style="font-size:11px;color:var(--muted);margin-left:auto" id="cnt"></span>
   </div>
-  <div class="sw"><canvas id="cv"></canvas></div>
-  <div class="slbl"><span>← 下手（お客から見て左）</span><span>上手（お客から見て右）→</span></div>
+  <div class="stage-area">
+    <div class="side-members" id="side-members"></div>
+    <div style="flex:1;min-width:0">
+      <div class="sw"><canvas id="cv"></canvas></div>
+      <div class="slbl"><span>← 下手</span><span>上手 →</span></div>
+    </div>
+  </div>
   <div class="members" id="members"></div>
 </div>
 
@@ -245,10 +260,49 @@ function resetBand(){
 }
 function clearAll(){if(!confirm('全て削除しますか？'))return;allItems[cBid]=[];draw();}
 
+function getPartIcon(part){
+  const p=part.toUpperCase();
+  if(p.includes('DR')) return '🥁';
+  if(p.includes('KEY')||p.includes('KBD')) return '🎹';
+  if(p.includes('VO')||p.includes('MC')) return '🎤';
+  if(p.includes('CHO')) return '🎙';
+  if(p.includes('BA')&&!p.includes('BAND')) return '🎸';
+  if(p.includes('GT')||p.includes('G1')||p.includes('G2')||p.includes('G①')||p.includes('G②')) return '🎸';
+  return '🎵';
+}
+
+function getShortName(fullName){
+  // 姓だけ or 短い名前を返す
+  const n=fullName.replace(/（.*?）/g,'').replace(/\(.*?\)/g,'').trim();
+  const parts=n.split(/[\s　]/);
+  return parts[parts.length>1?1:0]||n; // 名前（後ろ）を優先
+}
+
 function renderMembers(){
   const b=BANDS[cBid];
+
+  // 下部メンバーリスト
   document.getElementById('members').innerHTML='<div class="members-title">👥 '+b.name+' メンバー</div>'+
     b.members.filter(m=>m.n).map(m=>'<div class="mrow"><span class="mpart">'+m.p+'</span><span class="mname">'+m.n+'</span></div>').join('');
+
+  // サイドメンバーリスト
+  const sideEl=document.getElementById('side-members');
+  if(!sideEl)return;
+
+  // センターポジション判定（G1.Vo / Gt.Vo / Vo&G → センター）
+  sideEl.innerHTML=b.members.filter(m=>m.n).map(m=>{
+    const icon=getPartIcon(m.p);
+    const shortN=getShortName(m.n);
+    const isCenter=m.p.includes('Vo')&&(m.p.includes('G')||m.p.includes('Gt')||!b.members.some(x=>x.p!==m.p&&x.p.includes('Vo')));
+    // グッバイグッピーのセンター（〆）は特別扱い
+    const isCenterGG=(cBid==='gg'&&m.p.includes('G1'));
+    const centerClass=(isCenter||isCenterGG)?'center-pos':'';
+    return '<div class="side-member '+centerClass+'" title="'+m.p+' / '+m.n+'">'+
+      '<span class="side-icon">'+icon+'</span>'+
+      '<span class="side-name">'+shortN+'</span>'+
+      '<span class="side-part">'+m.p.split('&')[0].split('.')[0]+'</span>'+
+      '</div>';
+  }).join('');
 }
 
 function resize(){
