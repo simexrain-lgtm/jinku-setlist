@@ -321,14 +321,45 @@ function drawIt(it,dk){
       ctx.fillStyle='#fff';ctx.font='7px sans-serif';ctx.textAlign='center';ctx.fillText('Cho',x,y-bh*.6-3);
     }
     micStand(x,y+bh*.52,'rgba(255,255,255,.7)',13);
-    // amp line
-    if((it.type==='gt'||it.type==='ba_p')&&it.amp&&it.amp!=='DI直'){
-      const isR=it.amp.includes('上手');
-      const tgt=allItems[cBid].find(i=>(i.type==='ga_r'&&isR)||(i.type==='ga_l'&&!isR));
+    // amp line: ギターは ga_r/ga_l へ、ベースは ba へ
+    if(it.amp&&it.amp!=='DI直'){
+      let tgt=null;
+      let lineColor='rgba(255,210,60,.5)'; // ギター=黄色
+      if(it.type==='ba_p'){
+        // ベース奏者 → baアンプに繋ぐ
+        tgt=allItems[cBid].find(i=>i.type==='ba');
+        lineColor='rgba(100,180,255,.5)'; // ベース=青
+      } else if(it.type==='gt'){
+        // ギター奏者 → amp選択に応じて ga_r か ga_l
+        const isR=it.amp.includes('上手');
+        // 同じ側のアンプが複数ある場合、最も近いものを選ぶ
+        const candidates=allItems[cBid].filter(i=>isR?(i.type==='ga_r'):(i.type==='ga_l'));
+        if(candidates.length>0){
+          const ix=it.x??it.xp*W, iy=it.y??it.yp*W;
+          tgt=candidates.reduce((a,b)=>{
+            const ax=a.x??a.xp*W, ay=a.y??a.yp*W;
+            const bx=b.x??b.xp*W, by=b.y??b.yp*W;
+            return Math.hypot(ix-ax,iy-ay)<Math.hypot(ix-bx,iy-by)?a:b;
+          });
+        }
+      }
       if(tgt){
         const tx=tgt.x??tgt.xp*W,ty=tgt.y??tgt.yp*W;
-        ctx.save();ctx.strokeStyle='rgba(255,210,60,.4)';ctx.lineWidth=1.2;ctx.setLineDash([4,3]);
-        ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(tx,ty);ctx.stroke();ctx.restore();
+        ctx.save();
+        ctx.strokeStyle=lineColor;
+        ctx.lineWidth=1.5;
+        ctx.setLineDash([5,3]);
+        ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(tx,ty);ctx.stroke();
+        // 矢印（アンプ側に小さい三角）
+        const angle=Math.atan2(ty-y,tx-x);
+        ctx.setLineDash([]);
+        ctx.fillStyle=lineColor;
+        ctx.beginPath();
+        ctx.moveTo(tx,ty);
+        ctx.lineTo(tx-10*Math.cos(angle-0.4),ty-10*Math.sin(angle-0.4));
+        ctx.lineTo(tx-10*Math.cos(angle+0.4),ty-10*Math.sin(angle+0.4));
+        ctx.closePath();ctx.fill();
+        ctx.restore();
       }
     }
   } else if(d.cat==='drum'){
