@@ -79,7 +79,13 @@ body.edit-active #cv{cursor:grab}
 </style>
 </head>
 <body>
-<nav><div class="nav-inner"><span class="logo">🎸 ステージセッティング</span><a href="index.html" style="font-size:12px;color:var(--muted);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:7px;transition:.15s" onmouseover="this.style.borderColor='#ff6b1a';this.style.color='#ff6b1a'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">← セトリに戻る</a></div></nav>
+<nav><div class="nav-inner">
+  <span class="logo">🎸 ステージ</span>
+  <div style="display:flex;align-items:center;gap:8px">
+    <button id="nav-edit-btn" onclick="toggleEdit()" style="padding:7px 16px;border-radius:20px;border:1px solid var(--border2);background:var(--surface2);color:var(--muted);cursor:pointer;font-size:12px;font-weight:700;font-family:'Noto Sans JP',sans-serif;transition:.2s">✏️ 編集</button>
+    <a href="index.html" style="font-size:12px;color:var(--muted);text-decoration:none;padding:5px 10px;border:1px solid var(--border);border-radius:7px;transition:.15s">← セトリ</a>
+  </div>
+</div></nav>
 <div class="mode-banner" id="mode-banner" onclick="expandBanner()">
   <span class="mb-icon" id="mb-icon">🔒</span>
   <span class="mb-label" id="mb-label">閲覧モード — タップで誤操作防止</span>
@@ -495,9 +501,17 @@ function applyEditMode(){
   if(icon) icon.textContent=editMode?'✏️':'🔒';
   if(label) label.textContent=editMode?'編集モード中 — ドラッグで移動':'閲覧モード — 誤操作防止中';
   if(btn)   btn.textContent=editMode?'✅ 完了':'✏️ 編集する';
+  // ナビボタンも更新
+  const navBtn=document.getElementById('nav-edit-btn');
+  if(navBtn){
+    navBtn.textContent=editMode?'✅ 完了':'✏️ 編集';
+    navBtn.style.background=editMode?'#ff6b1a':'';
+    navBtn.style.color=editMode?'#000':'';
+    navBtn.style.borderColor=editMode?'#ff6b1a':'';
+  }
   mb.classList.remove('mini');
   clearTimeout(bannerTimer);
-  bannerTimer=setTimeout(()=>mb.classList.add('mini'),3000);
+  bannerTimer=setTimeout(()=>mb.classList.add('mini'),4000);
   draw();
 }
 
