@@ -8,6 +8,15 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{--bg:#0f0f0f;--surface:#1a1a1a;--surface2:#222;--surface3:#2a2a2a;--border:#333;--border2:#444;--acc:#ff6b1a;--acc2:#ff9d5c;--text:#f0ede8;--muted:#888;--muted2:#555;--success:#2ecc71;--danger:#e74c3c;--warn:#f39c12;--info:#3498db;}
+/* 編集モード：背景をオレンジ系に */
+body.edit-active{--bg:#1a0d00;--surface:#2a1500;--surface2:#331a00;--surface3:#3d2000;--border:#6b3a00;--border2:#8a4d00;--text:#fff5ec;--muted:#cc8844;}
+body.edit-active nav{background:#ff6b1aee;border-bottom-color:#ff9d5c}
+body.edit-active .nav-logo{color:#000}
+body.edit-active #nav-clock{color:#000}
+body.edit-active #nav-next{color:#000}
+body.edit-active .nav-back{border-color:rgba(0,0,0,.3);color:#000}
+body.edit-active .nav-back:hover{border-color:#000;color:#000}
+body.edit-active #edit-mode-btn{background:#000;color:#ff6b1a;border-color:#000}
 body{font-family:'Noto Sans JP',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:14px;line-height:1.5;padding-bottom:60px}
 
 /* NAV */
@@ -78,16 +87,16 @@ nav{background:#0a0a0a;border-bottom:1px solid var(--border);padding:11px 16px;p
 .pa-note{background:var(--surface3);color:var(--muted);border:1px solid var(--border)}
 .pa-sheet-summary{padding:10px 14px;background:var(--surface3);border-top:1px solid var(--border);font-size:12px;color:var(--muted);display:flex;gap:16px}
 /* MODE BANNER */
-.mode-banner{position:fixed;bottom:0;left:0;right:0;z-index:200;padding:10px 16px;display:none;align-items:center;justify-content:space-between;gap:10px;backdrop-filter:blur(8px)}
-.mode-banner.view-mode{background:rgba(10,10,10,.92);border-top:2px solid var(--border2)}
-.mode-banner.edit-mode{background:rgba(255,107,26,.95);border-top:2px solid var(--acc2)}
+.mode-banner{position:fixed;bottom:0;left:0;right:0;z-index:200;padding:12px 16px;display:none;align-items:center;justify-content:space-between;gap:10px;backdrop-filter:blur(12px);transition:background .3s}
+.mode-banner.view-mode{background:rgba(10,10,10,.95);border-top:1px solid var(--border2)}
+.mode-banner.edit-mode{background:#ff6b1a;border-top:2px solid #ff9d5c}
 .mode-banner.show{display:flex}
-.mode-banner-label{font-size:15px;font-weight:700;letter-spacing:.05em;display:flex;align-items:center;gap:8px}
+.mode-banner-label{font-size:17px;font-weight:700;letter-spacing:.03em;display:flex;align-items:center;gap:10px}
 .view-mode .mode-banner-label{color:var(--muted)}
 .edit-mode .mode-banner-label{color:#000}
-.mode-banner-btn{padding:10px 22px;border-radius:9px;border:none;cursor:pointer;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;transition:.15s}
-.view-mode .mode-banner-btn{background:var(--acc);color:#000}
-.edit-mode .mode-banner-btn{background:#000;color:#fff}
+.mode-banner-btn{padding:11px 24px;border-radius:10px;border:none;cursor:pointer;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;transition:.15s}
+.view-mode .mode-banner-btn{background:#ff6b1a;color:#000;font-size:15px}
+.edit-mode .mode-banner-btn{background:#000;color:#fff;font-size:15px}
 /* STAGE VIEW - 1画面8曲に収まるサイズ */
 .sl-list{padding:3px 5px}
 .sl-item{padding:8px 10px!important;margin-bottom:3px!important;transition:transform .2s ease,opacity .2s ease,margin .2s ease,max-height .25s ease;}
@@ -106,12 +115,18 @@ nav{background:#0a0a0a;border-bottom:1px solid var(--border);padding:11px 16px;p
 /* 挿入インジケーター */
 .insert-above{border-top:3px solid var(--acc)!important;margin-top:-3px}
 .insert-below{border-bottom:3px solid var(--acc)!important}
-.insert-indicator{height:0;overflow:hidden;transition:height .15s ease;background:transparent}
-.insert-indicator.show{height:40px;background:#ff6b1a18;border-radius:8px;border:2px dashed var(--acc);display:flex;align-items:center;justify-content:center;color:var(--acc);font-size:12px;font-weight:700}
 /* ドラッグ中のアイテム */
-.sl-item.dragging-src{opacity:.35;transform:scale(.97)}
-@keyframes insert-pop{0%{transform:scaleY(0);opacity:0}60%{transform:scaleY(1.08)}100%{transform:scaleY(1);opacity:1}}
-.sl-item.just-inserted{animation:insert-pop .25s ease-out}
+.sl-item.dragging-src{opacity:.25;transform:scale(.96);box-shadow:none!important}
+/* スライド挿入アニメーション */
+@keyframes slideInDown{0%{transform:translateY(-40px);opacity:0}60%{transform:translateY(4px)}100%{transform:translateY(0);opacity:1}}
+@keyframes slideInUp{0%{transform:translateY(40px);opacity:0}60%{transform:translateY(-4px)}100%{transform:translateY(0);opacity:1}}
+@keyframes nudgeDown{0%{transform:translateY(0)}50%{transform:translateY(6px)}100%{transform:translateY(0)}}
+@keyframes nudgeUp{0%{transform:translateY(0)}50%{transform:translateY(-6px)}100%{transform:translateY(0)}}
+.sl-item.anim-in-down{animation:slideInDown .25s cubic-bezier(.34,1.56,.64,1) forwards}
+.sl-item.anim-in-up{animation:slideInUp .25s cubic-bezier(.34,1.56,.64,1) forwards}
+.sl-item.anim-nudge-down{animation:nudgeDown .2s ease forwards}
+.sl-item.anim-nudge-up{animation:nudgeUp .2s ease forwards}
+.sl-item.just-inserted{animation:slideInDown .25s cubic-bezier(.34,1.56,.64,1) forwards}
 /* DRAG GHOST */
 #drag-ghost{
   position:fixed;z-index:999;pointer-events:none;
@@ -554,9 +569,12 @@ function applyEditMode(){
   const modeLabel=document.getElementById('mode-banner-label');
   const modeBtn=document.getElementById('mode-banner-btn');
 
+  // body全体のテーマ切り替え
+  document.body.classList.toggle('edit-active', editMode);
+
   // ナビの編集ボタン
   if(btn){
-    btn.textContent=editMode?'🔒 閲覧モードへ':'✏️ 編集モードへ';
+    btn.textContent=editMode?'🔒 閲覧':'✏️ 編集';
     btn.className='edit-mode-btn'+(editMode?' on':'');
   }
 
@@ -573,8 +591,8 @@ function applyEditMode(){
     modeBanner.classList.toggle('edit-mode', editMode);
     modeBanner.classList.toggle('view-mode', !editMode);
   }
-  if(modeLabel) modeLabel.textContent=editMode?'✏️ 編集モード中':'🔒 閲覧モード';
-  if(modeBtn)   modeBtn.textContent=editMode?'🔒 閲覧モードに戻る':'✏️ 編集する';
+  if(modeLabel) modeLabel.textContent=editMode?'✏️  編集モード中 — 0.5秒長押しで並び替え':'🔒  閲覧モード — 誤操作防止中';
+  if(modeBtn)   modeBtn.textContent=editMode?'✅ 完了（閲覧に戻る）':'✏️  編集する';
 
   // sl-itemのロック
   document.querySelectorAll('.sl-item').forEach(el=>{
@@ -942,7 +960,7 @@ function dp(e,i){
     const moved=items.splice(dragSrc,1)[0];
     const ri=insertIdx>dragSrc?insertIdx-1:insertIdx;
     items.splice(ri,0,moved); render(); autoSave();
-    animateInsert(moved.id, ri, items.length);
+    animateInsert(moved.id, ri, dragSrc, items.length);
     showToast('✓ 順番を変更しました');
   }
   dragSrc=null;dragOver=null;insertIdx=null;
@@ -1009,25 +1027,38 @@ function te(e,i){
     const moved=items.splice(touchSrc,1)[0];
     const ri=insertIdx>touchSrc?insertIdx-1:insertIdx;
     items.splice(ri,0,moved); render(); autoSave();
-    animateInsert(moved.id, ri, items.length);
+    animateInsert(moved.id, ri, touchSrc, items.length);
     showToast('✓ 順番を変更しました');
   }
   touchSrc=null;dragOver=null;insertIdx=null;longPressActive=false;touchMoved=false;
 }
 
 // ===== TOAST =====
-function animateInsert(movedId, insertedAt, total){
-  // 再描画後、移動した曲と周囲にスライドアニメ
+function animateInsert(movedId, insertedAt, origSrc, total){
+  // origSrc: 元の位置, insertedAt: 新しい位置
   render();
   setTimeout(()=>{
     items.forEach((it, idx)=>{
       const el=document.getElementById('si-'+it.id);
       if(!el)return;
+      // 移動した曲
       if(it.id===movedId){
-        // 移動した曲は上からor下からスライドイン
-        el.classList.remove('slide-up','slide-down','just-inserted');
+        const fromAbove=origSrc<insertedAt;
+        el.classList.remove('anim-in-down','anim-in-up','just-inserted');
         void el.offsetWidth;
-        el.classList.add('just-inserted');
+        el.classList.add(fromAbove?'anim-in-down':'anim-in-up');
+        setTimeout(()=>el.classList.remove('anim-in-down','anim-in-up'),300);
+        return;
+      }
+      // 影響を受けた周囲の曲をnudge
+      const min=Math.min(origSrc,insertedAt);
+      const max=Math.max(origSrc,insertedAt);
+      if(idx>=min&&idx<=max){
+        const nudgeDir=origSrc>insertedAt?'anim-nudge-down':'anim-nudge-up';
+        el.classList.remove('anim-nudge-down','anim-nudge-up');
+        void el.offsetWidth;
+        el.classList.add(nudgeDir);
+        setTimeout(()=>el.classList.remove('anim-nudge-down','anim-nudge-up'),250);
       }
     });
   },10);
