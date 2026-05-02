@@ -77,6 +77,24 @@ nav{background:#0a0a0a;border-bottom:1px solid var(--border);padding:11px 16px;p
 .pa-pa{background:#1a2a3a;color:#74b9ff;border:1px solid #2a4060}
 .pa-note{background:var(--surface3);color:var(--muted);border:1px solid var(--border)}
 .pa-sheet-summary{padding:10px 14px;background:var(--surface3);border-top:1px solid var(--border);font-size:12px;color:var(--muted);display:flex;gap:16px}
+/* MODE BANNER */
+.mode-banner{position:fixed;bottom:0;left:0;right:0;z-index:200;padding:10px 16px;display:none;align-items:center;justify-content:space-between;gap:10px;backdrop-filter:blur(8px)}
+.mode-banner.view-mode{background:rgba(10,10,10,.92);border-top:2px solid var(--border2)}
+.mode-banner.edit-mode{background:rgba(255,107,26,.95);border-top:2px solid var(--acc2)}
+.mode-banner.show{display:flex}
+.mode-banner-label{font-size:15px;font-weight:700;letter-spacing:.05em;display:flex;align-items:center;gap:8px}
+.view-mode .mode-banner-label{color:var(--muted)}
+.edit-mode .mode-banner-label{color:#000}
+.mode-banner-btn{padding:10px 22px;border-radius:9px;border:none;cursor:pointer;font-size:14px;font-weight:700;font-family:'Noto Sans JP',sans-serif;transition:.15s}
+.view-mode .mode-banner-btn{background:var(--acc);color:#000}
+.edit-mode .mode-banner-btn{background:#000;color:#fff}
+/* STAGE VIEW - 大きい文字 */
+.sl-item{font-size:16px}
+.item-name{font-size:17px!important;font-weight:700!important}
+.item-num{width:32px!important;height:32px!important;font-size:14px!important}
+.item-dur{font-size:13px!important}
+.tag{font-size:12px!important;padding:3px 10px!important}
+.sl-item{padding:12px 10px!important}
 /* LONG PRESS */
 @keyframes longpress-fill{from{width:0%}to{width:100%}}
 .long-press-active{border-color:var(--acc)!important;background:#ff6b1a18!important;transform:scale(1.02);transition:transform .1s;}
@@ -331,6 +349,12 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5)}
     </div>
   </div>
 
+  <!-- モードバナー -->
+  <div class="mode-banner" id="mode-banner">
+    <span class="mode-banner-label" id="mode-banner-label">🔒 閲覧モード</span>
+    <button class="mode-banner-btn" id="mode-banner-btn" onclick="toggleEditMode()">✏️ 編集する</button>
+  </div>
+
   <div id="send-result" class="send-result"></div>
   <button class="send-btn" id="send-btn" onclick="sendToSheets()" disabled>
     <span>📊</span><span id="send-lbl">スプレッドシートに送信</span>
@@ -486,18 +510,38 @@ function applyEditMode(){
   const banner=document.getElementById('edit-lock-banner');
   const triggers=document.getElementById('add-triggers');
   const addForm=document.getElementById('add-form');
+  const modeBanner=document.getElementById('mode-banner');
+  const modeLabel=document.getElementById('mode-banner-label');
+  const modeBtn=document.getElementById('mode-banner-btn');
+
+  // ナビの編集ボタン
   if(btn){
-    btn.textContent=editMode?'🔒 閲覧に戻る':'✏️ 編集';
+    btn.textContent=editMode?'🔒 閲覧モードへ':'✏️ 編集モードへ';
     btn.className='edit-mode-btn'+(editMode?' on':'');
   }
+
+  // ロックバナー（セトリ上部）
   if(banner) banner.style.display=editMode?'none':'flex';
+
+  // 曲追加エリア
   if(triggers) triggers.style.display=editMode?'flex':'none';
   if(addForm&&!editMode) closeForm();
-  // sl-itemにlocked付与
+
+  // 下部モードバナー
+  if(modeBanner){
+    modeBanner.classList.toggle('show', true);
+    modeBanner.classList.toggle('edit-mode', editMode);
+    modeBanner.classList.toggle('view-mode', !editMode);
+  }
+  if(modeLabel) modeLabel.textContent=editMode?'✏️ 編集モード中':'🔒 閲覧モード';
+  if(modeBtn)   modeBtn.textContent=editMode?'🔒 閲覧モードに戻る':'✏️ 編集する';
+
+  // sl-itemのロック
   document.querySelectorAll('.sl-item').forEach(el=>{
     el.classList.toggle('locked',!editMode);
     el.setAttribute('draggable', editMode?'true':'false');
   });
+
   // act-btnの有効/無効
   document.querySelectorAll('.act-btn').forEach(el=>{
     el.style.pointerEvents=editMode?'':'none';
@@ -512,6 +556,8 @@ function goTop(){
   document.getElementById('edit-mode-btn').style.display='none';
   editMode=false;
   document.getElementById('save-label').textContent='';
+  const mb=document.getElementById('mode-banner');
+  if(mb)mb.classList.remove('show');
   renderTop();
   window.scrollTo(0,0);
 }
@@ -531,6 +577,8 @@ function goSetlist(id){
   document.getElementById('edit-mode-btn').style.display='flex';
   editMode=false;
   document.getElementById('save-dot').classList.add('saved');
+  // モードバナーを表示
+  setTimeout(applyEditMode,50);
   document.getElementById('save-label').textContent='保存済み ✓';
   document.getElementById('send-result').style.display='none';
   document.getElementById('send-lbl').textContent=band.sentAt?'再送信する':'スプレッドシートに送信';
