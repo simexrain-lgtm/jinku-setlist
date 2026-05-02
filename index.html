@@ -205,9 +205,12 @@ input[type=text],input[type=tel],input[type=number],input[type=date],textarea{ba
 input:focus,textarea:focus{border-color:var(--acc);background:var(--surface3)}
 input::placeholder,textarea::placeholder{color:var(--muted2)}
 input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5)}
-.send-btn{width:100%;padding:14px;border-radius:10px;border:none;background:#27ae60;color:#fff;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:.15s;margin-bottom:10px;font-family:'Noto Sans JP',sans-serif}
-.send-btn:hover{background:#229954}
-.send-btn:disabled{background:var(--surface3);color:var(--muted);cursor:not-allowed}
+.send-btn{width:100%;padding:16px;border-radius:10px;border:none;background:#27ae60;color:#fff;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;transition:.15s;margin-bottom:8px;font-family:'Noto Sans JP',sans-serif;letter-spacing:.03em}
+.send-btn:hover{background:#229954;transform:translateY(-1px)}
+.send-btn:active{transform:translateY(0)}
+.send-btn:disabled{background:var(--surface3);color:var(--muted2);cursor:not-allowed}
+.send-btn:not(:disabled){box-shadow:0 4px 16px rgba(46,204,113,.35);animation:send-pulse 2s ease-in-out infinite}
+@keyframes send-pulse{0%,100%{box-shadow:0 4px 16px rgba(46,204,113,.35)}50%{box-shadow:0 4px 24px rgba(46,204,113,.6)}}
 .send-result{padding:11px 14px;border-radius:9px;font-size:13px;text-align:center;margin-bottom:10px;display:none;line-height:1.6}
 .send-ok{background:#0d2b1a;color:var(--success);border:1px solid #1a4a2a}
 .send-err{background:#2b0d0d;color:var(--danger);border:1px solid #4a1a1a}
@@ -367,10 +370,16 @@ input[type="date"]::-webkit-calendar-picker-indicator{filter:invert(.5)}
     <button class="mode-banner-btn" id="mode-banner-btn" onclick="toggleEditMode()">✏️ 編集する</button>
   </div>
 
-  <div id="send-result" class="send-result"></div>
-  <button class="send-btn" id="send-btn" onclick="sendToSheets()" disabled>
-    <span>📊</span><span id="send-lbl">スプレッドシートに送信</span>
-  </button>
+  <!-- 送信エリア -->
+  <div id="send-box" style="background:var(--surface);border:2px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px">
+    <div style="font-size:11px;font-weight:700;color:var(--acc);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">📤 スタッフへ共有</div>
+    <div style="font-size:13px;color:var(--muted);margin-bottom:12px;line-height:1.6">入力が終わったら必ず送信してください。<br>PAスタッフ・主催者に届きます。</div>
+    <div id="send-result" class="send-result"></div>
+    <button class="send-btn" id="send-btn" onclick="sendToSheets()" disabled style="margin-bottom:8px">
+      <span>📊</span><span id="send-lbl">送信する（必須）</span>
+    </button>
+    <div id="send-status" style="text-align:center;font-size:12px;color:var(--muted)">まだ送信されていません</div>
+  </div>
 
   <div class="panel pa-sheet">
     <div class="pa-sheet-hd" onclick="togglePaSheet()">
@@ -593,7 +602,21 @@ function goSetlist(id){
   setTimeout(applyEditMode,50);
   document.getElementById('save-label').textContent='保存済み ✓';
   document.getElementById('send-result').style.display='none';
-  document.getElementById('send-lbl').textContent=band.sentAt?'再送信する':'スプレッドシートに送信';
+  const isSent=!!band.sentAt;
+  document.getElementById('send-lbl').textContent=isSent?'再送信する':'送信する（必須）';
+  const box=document.getElementById('send-box');
+  if(box) box.style.borderColor=isSent?'var(--success)':'var(--border)';
+  const st=document.getElementById('send-status');
+  if(st){
+    if(isSent){
+      const d=new Date(band.sentAt);
+      st.textContent='✅ '+d.getHours()+'時'+String(d.getMinutes()).padStart(2,'0')+'分 に送信済み';
+      st.style.color='var(--success)';
+    } else {
+      st.textContent='まだ送信されていません';
+      st.style.color='var(--muted)';
+    }
+  }
   render();
   window.scrollTo(0,0);
 }
@@ -730,14 +753,25 @@ async function sendToSheets(){
   try{
     await fetch(GAS_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     res.className='send-result send-ok';
-    res.textContent='✅ 送信しました！データはこの端末にも保存されています。';
-    res.style.display='block';lbl.textContent='再送信する';
-    band.sentAt=new Date().toISOString();saveBands();
+    res.textContent='✅ 送信完了！PAスタッフ・主催者に届きました。';
+    res.style.display='block';
+    lbl.textContent='再送信する';
+    const now=new Date();
+    const timeStr=now.getHours()+'時'+String(now.getMinutes()).padStart(2,'0')+'分';
+    const st=document.getElementById('send-status');
+    if(st){st.textContent='✅ '+timeStr+' に送信済み';st.style.color='var(--success)';}
+    // 送信ボックスの枠をグリーンに
+    const box=document.getElementById('send-box');
+    if(box){box.style.borderColor='var(--success)';}
+    band.sentAt=now.toISOString();saveBands();
     playPop(true);vib(true);
   }catch(e){
     res.className='send-result send-err';
-    res.textContent='❌ 送信に失敗しました。データは端末に保存されています。';
-    res.style.display='block';lbl.textContent='スプレッドシートに送信';
+    res.textContent='❌ 送信に失敗しました。通信環境を確認して再度お試しください。';
+    res.style.display='block';
+    lbl.textContent='再送信する';
+    const st2=document.getElementById('send-status');
+    if(st2){st2.textContent='⚠️ 送信失敗 — 再送信してください';st2.style.color='var(--danger)';}
   }
   btn.disabled=false;
 }
